@@ -1,0 +1,93 @@
+<link rel="stylesheet" href="css/plugins/galleryimage/custom-galleryimage.css" />
+<@row>
+	<@columns>
+		<@box>
+			<@boxHeader title='#i18n{galleryimage.manage_image.title}'>
+				<@tform method='post' action='jsp/admin/plugins/galleryimage/GetCreateImage.jsp?idGallery=${idGallery!}' type='inline'>
+					<@button type='submit' buttonIcon='plus' title='#i18n{galleryimage.manage_image.add_new_image}' size='' color='primary' />
+				</@tform>
+			</@boxHeader>
+			<@boxBody>
+				<@div class="galleryimage-selector">
+					<!-- Tab panes -->
+					<@div class="tab-content">
+						<h2>#i18n{galleryimage.manage_image.list_select_images}</h2>
+						<@div class="tab-pane active" id="active">
+							<@div class="galleryimage-container">
+								<#if listImageSelected??>
+								<#list listImageSelected as image>
+									<@div class="galleryimage">
+										<@div class="galleryimage-image">
+											<img src="${image.imageBase64}" alt=""/>
+										</@div>
+										<@div class="galleryimage-desc">
+											<@aButton buttonIcon='trash'  href='jsp/admin/plugins/galleryimage/ManageGallery.jsp?action=deleteImageToGallery&id=${idGallery!}&idImage=${image.idImage}' class="delete" size='sm' title='#i18n{galleryimage.manage_image.delete}' color='danger' />
+										</@div>
+									</@div>
+								</#list>
+								</#if>		
+								<@div class="footer">							
+								</@div>
+							</@div>
+						</@div>
+						<@paginationAdmin paginator=paginatorImageSelected />
+					</@div>
+				</@div>
+				<@div class="galleryimage-selector">
+					<!-- Tab panes -->
+					<@div class="tab-content">
+						<h2>#i18n{galleryimage.manage_image.list_available_images_only_gallery}</h2>
+						<@div class="tab-pane active" id="active">
+							<@div class="galleryimage-container">
+								<#if listImageOfGallery??>
+								<#list listImageOfGallery as image>
+									<@div class="galleryimage" id="image${image.idImage}">
+										<@div class="galleryimage-image">
+											<img src="${image.imageBase64}" alt="" alt=""/>
+										</@div>	
+										<@div class="galleryimage-desc">${image.title}</@div>
+										<@div class="galleryimage-desc">
+											<@aButton href='jsp/admin/plugins/galleryimage/ManageGallery.jsp?action=addImageToGallery&id=${idGallery!}&idImage=${image.idImage}' buttonIcon='plus' class="add" id="${image.idImage}" size='sm' title='#i18n{galleryimage.manage_image.add}' color='primary' />
+											<@aButton href='jsp/admin/plugins/galleryimage/GetModifyImage.jsp?id=${(image.idImage)!}' buttonIcon='edit' size='sm' title='#i18n{galleryimage.manage_gallery_image.button_modify}' hideTitle=['all'] />
+											<@aButton href='jsp/admin/plugins/galleryimage/DoDeleteImage.jsp?id=${(image.idImage)!}' buttonIcon='trash' size='sm' title='#i18n{galleryimage.manage_gallery_image.button_delete}' hideTitle=['all'] color='danger' />										
+										</@div>
+									</@div>	
+								</#list>
+								</#if>		
+								<@div class="footer">							
+								</@div>
+							</@div>
+						</@div>
+						<@paginationAdmin paginator=paginatorImageOfGallery/>
+					</@div>
+				</@div>		
+				<@div class="galleryimage-selector">
+					<!-- Tab panes -->
+					<@div class="tab-content">
+						<h2>#i18n{galleryimage.manage_image.list_available_images}</h2>
+						<@div class="tab-pane active" id="active">
+							<@div class="galleryimage-container">
+								<#if listAvailableImage??>
+								<#list listAvailableImage as image>
+									<@div class="galleryimage" id="image${image.idImage}">
+										<@div class="galleryimage-image">
+											<img src="${image.imageBase64}" alt="" alt=""/>
+										</@div>	
+										<@div class="galleryimage-desc">${image.title}</@div>
+										<@div class="galleryimage-desc">
+											<@aButton href='jsp/admin/plugins/galleryimage/ManageGallery.jsp?action=addImageToGallery&id=${idGallery!}&idImage=${image.idImage}' buttonIcon='plus' class="add" id="${image.idImage}" size='sm' title='#i18n{galleryimage.manage_image.add}' color='primary' />
+										</@div>
+									</@div>	
+								</#list>
+								</#if>		
+								<@div class="footer">							
+								</@div>
+							</@div>
+						</@div>
+						<@paginationAdmin paginator=paginatorImage/>
+					</@div>
+				</@div>				
+			</@boxBody>
+		</@box>
+	</@columns>
+</@row>

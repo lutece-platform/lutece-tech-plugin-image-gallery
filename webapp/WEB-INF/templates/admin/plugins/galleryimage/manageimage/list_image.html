@@ -1,0 +1,35 @@
+<@row>
+	<@columns>
+		<@box color='info'>
+			<@boxHeader title='#i18n{galleryimage.gallery_image.list_image.name}' boxTools=true skipHeader=false>
+				<@tform method='post' action='jsp/admin/plugins/galleryimage/GetCreateImage.jsp' type='inline'>
+					<@button type='submit' buttonIcon='plus' title='#i18n{galleryimage.gallery_image.list_image.button_create_image}' size='' color='primary' />
+				</@tform>
+			</@boxHeader>
+			<@boxBody>
+			<@table>
+				<@tr>
+					<@th>#i18n{galleryimage.gallery_image.list_image.columnId}</@th>
+					<@th>#i18n{galleryimage.gallery_image.list_image.columnLabel}</@th>
+					<@th>#i18n{galleryimage.gallery_image.list_image.columnIdFile}</@th>
+					<@th>#i18n{galleryimage.gallery_image.list_image.columnAction}</@th>				
+				</@tr>
+				<@tableHeadBodySeparator />
+					<#if listImage?? >
+						<#list listImage as image>
+						<@tr>
+							<@td>${(image.idImage)!}</@td>
+							<@td>${(image.title)!}</@td>
+							<@td>${(image.idFile)!}</@td>
+							<@td>
+								<@aButton href='jsp/admin/plugins/galleryimage/GetModifyImage.jsp?id=${(image.idImage)!}' buttonIcon='edit' size='sm' title='#i18n{galleryimage.manage_gallery_image.button_modify}' hideTitle=['all'] />
+								<@aButton href='jsp/admin/plugins/galleryimage/DoDeleteImage.jsp?id=${(image.idImage)!}' buttonIcon='trash' size='sm' title='#i18n{galleryimage.manage_gallery_image.button_delete}' hideTitle=['all'] color='danger' />
+							</@td>
+						</@tr>
+						</#list>
+					</#if>
+			</@table>
+			</@boxBody>
+		</@box>
+	</@columns>
+</@row>

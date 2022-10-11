@@ -1,0 +1,15 @@
+ <#macro galleryImage codeGallery='' inputName='' idFileSelected=''>
+ 	<div class="gallery-image"></div>
+ 	<script>
+		var request = $.ajax( { 
+			url : 'servlet/plugins/galleryimage',
+			type : 'GET',
+			data : {codeGallery:'${codeGallery!}',inputName:'${inputName}',idFileSelected:'${idFileSelected}'},
+			dataType : 'html'
+		} );
+		
+		request.done( function ( content ) { 
+			$( '.gallery-image' ).html( content );
+		} );
+ 	</script>
+ </#macro>

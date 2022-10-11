@@ -1,0 +1,230 @@
+<link rel="stylesheet" href="css/plugins/galleryimage/swiper-bundle.min.css" />
+
+<h2>#i18n{galleryimage.create_gallery_image.preview}</h2>
+
+<!-- Navigation -->
+<div class="NAVIGATION swiper">
+	<!-- Additional required wrapper -->
+	<div class="swiper-wrapper">
+		<!-- Slides -->
+		<div class="swiper-slide">Slide 1</div>
+		<div class="swiper-slide">Slide 2</div>
+		<div class="swiper-slide">Slide 3</div>
+		<div class="swiper-slide">Slide 4</div>
+		<div class="swiper-slide">Slide 5</div>
+		<div class="swiper-slide">Slide 6</div>
+		<div class="swiper-slide">Slide 7</div>
+		<div class="swiper-slide">Slide 8</div>
+	</div>
+	<div class="swiper-button-next"></div>
+	<div class="swiper-button-prev"></div>
+
+	<!-- holder for the fullscreen slider -->
+	<div id="fullscreen-swiper"></div>
+	<div id="fullscreen-swiper-backdrop"></div>
+</div>
+
+<!-- Pagination -->
+<div class="PAGINATION swiper">
+	<!-- Additional required wrapper -->
+	<div class="swiper-wrapper">
+		<!-- Slides -->
+		<div class="swiper-slide">Slide 1</div>
+		<div class="swiper-slide">Slide 2</div>
+		<div class="swiper-slide">Slide 3</div>
+		<div class="swiper-slide">Slide 4</div>
+		<div class="swiper-slide">Slide 5</div>
+		<div class="swiper-slide">Slide 6</div>
+		<div class="swiper-slide">Slide 7</div>
+		<div class="swiper-slide">Slide 8</div>
+	</div>
+	<div class="swiper-pagination"></div>
+</div>
+
+<!-- Pagination Progress -->
+<div class="PAGINATIONPROGRESS swiper">
+	<!-- Additional required wrapper -->
+	<div class="swiper-wrapper">
+		<!-- Slides -->
+		<div class="swiper-slide">Slide 1</div>
+		<div class="swiper-slide">Slide 2</div>
+		<div class="swiper-slide">Slide 3</div>
+		<div class="swiper-slide">Slide 4</div>
+		<div class="swiper-slide">Slide 5</div>
+		<div class="swiper-slide">Slide 6</div>
+		<div class="swiper-slide">Slide 7</div>
+		<div class="swiper-slide">Slide 8</div>
+	</div>
+	<div class="swiper-button-next"></div>
+	<div class="swiper-button-prev"></div>
+	<div class="swiper-pagination"></div>
+</div>
+
+<!-- Scrollbar -->
+<div class="SCROLLBAR swiper">
+	<!-- Additional required wrapper -->
+	<div class="swiper-wrapper">
+		<!-- Slides -->
+		<div class="swiper-slide">Slide 1</div>
+		<div class="swiper-slide">Slide 2</div>
+		<div class="swiper-slide">Slide 3</div>
+		<div class="swiper-slide">Slide 4</div>
+		<div class="swiper-slide">Slide 5</div>
+		<div class="swiper-slide">Slide 6</div>
+		<div class="swiper-slide">Slide 7</div>
+		<div class="swiper-slide">Slide 8</div>
+	</div>
+	<div class="swiper-scrollbar"></div>
+</div>
+
+<!-- Vertical -->
+<div class="VERTICAL swiper">
+	<!-- Additional required wrapper -->
+	<div class="swiper-wrapper">
+		<!-- Slides -->
+		<div class="swiper-slide">Slide 1</div>
+		<div class="swiper-slide">Slide 2</div>
+		<div class="swiper-slide">Slide 3</div>
+		<div class="swiper-slide">Slide 4</div>
+		<div class="swiper-slide">Slide 5</div>
+		<div class="swiper-slide">Slide 6</div>
+		<div class="swiper-slide">Slide 7</div>
+		<div class="swiper-slide">Slide 8</div>
+	</div>
+	<div class="swiper-pagination"></div>
+</div>
+
+<!-- Freemode -->
+<div class="FREEMODE swiper">
+	<!-- Additional required wrapper -->
+	<div class="swiper-wrapper">
+		<!-- Slides -->
+		<div class="swiper-slide">Slide 1</div>
+		<div class="swiper-slide">Slide 2</div>
+		<div class="swiper-slide">Slide 3</div>
+		<div class="swiper-slide">Slide 4</div>
+		<div class="swiper-slide">Slide 5</div>
+		<div class="swiper-slide">Slide 6</div>
+		<div class="swiper-slide">Slide 7</div>
+		<div class="swiper-slide">Slide 8</div>
+	</div>
+	<div class="swiper-pagination"></div>
+</div>
+
+<!-- Zoom --> 
+<div class="ZOOM swiper">
+	<!-- Additional required wrapper -->
+	<div class="swiper-wrapper">
+		<!-- Slides -->
+		<div class="swiper-slide"><div class="swiper-zoom-container">Slide 1</div></div>
+		<div class="swiper-slide"><div class="swiper-zoom-container">Slide 2</div></div>
+		<div class="swiper-slide"><div class="swiper-zoom-container">Slide 3</div></div>
+		<div class="swiper-slide"><div class="swiper-zoom-container">Slide 4</div></div>
+		<div class="swiper-slide"><div class="swiper-zoom-container">Slide 5</div></div>
+		<div class="swiper-slide"><div class="swiper-zoom-container">Slide 6</div></div>
+		<div class="swiper-slide"><div class="swiper-zoom-container">Slide 7</div></div>
+		<div class="swiper-slide"><div class="swiper-zoom-container">Slide 8</div></div>
+	</div>
+	<div class="swiper-button-next"></div>
+	<div class="swiper-button-prev"></div>
+	<div class="swiper-pagination"></div>
+</div>
+
+
+<script src="js/plugins/galleryimage/swiper-bundle.min.js"></script>
+<script>
+	var swiperNavigation = new Swiper(".NAVIGATION", {
+		navigation : {
+			nextEl : ".swiper-button-next",
+			prevEl : ".swiper-button-prev",
+		},
+	});
+
+	var swiperPagination = new Swiper(".PAGINATION", {
+		pagination : {
+			el : ".swiper-pagination",
+		},
+	});
+
+	var swiperPaginationProgress = new Swiper(".PAGINATIONPROGRESS", {
+		pagination : {
+			el : ".swiper-pagination",
+			type : "progressbar",
+		},
+		navigation : {
+			nextEl : ".swiper-button-next",
+			prevEl : ".swiper-button-prev",
+		},
+	});
+
+	var swiperScrollbar = new Swiper(".SCROLLBAR", {
+		scrollbar : {
+			el : ".swiper-scrollbar",
+			hide : true,
+		},
+	});
+
+	var swiperVertical = new Swiper(".VERTICAL", {
+		direction : "vertical",
+		pagination : {
+			el : ".swiper-pagination",
+			clickable : true,
+		},
+	});
+
+	var swiperFreemode = new Swiper(".FREEMODE", {
+		slidesPerView : 3,
+		spaceBetween : 30,
+		freeMode : true,
+		pagination : {
+			el : ".swiper-pagination",
+			clickable : true,
+		},
+	});
+
+	var swiperZoom = new Swiper(".ZOOM", {
+		zoom : true,
+		navigation : {
+			nextEl : ".swiper-button-next",
+			prevEl : ".swiper-button-prev",
+		},
+		pagination : {
+			el : ".swiper-pagination",
+			clickable : true,
+		},
+	});
+</script>
+<style>
+:root {
+  --widthSwiper: 850px;
+  --heightSwiper: 500px;
+}
+.swiper {
+	width: var(--widthSwiper);
+	height: var(--heightSwiper);
+}
+.swiper-slide {
+    background-color: white;
+    text-align: center;
+    font-size: 18px;
+    /* Center slide text vertically */
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    -webkit-justify-content: center;
+    justify-content: center;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    -webkit-align-items: center;
+    align-items: center;
+}
+.swiper-slide img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+</style>
