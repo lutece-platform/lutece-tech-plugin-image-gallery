@@ -1,0 +1,295 @@
+<link rel="stylesheet" href="css/plugins/galleryimage/swiper-bundle.min.css" />
+<script src="js/plugins/galleryimage/swiper-bundle.min.js"></script>
+
+<#if config?? && config.galleryImageType == 'NAVIGATION'>
+	<!-- Navigation -->
+	<div class="navigation swiper">
+		<!-- Additional required wrapper -->
+		<div class="swiper-wrapper">
+			<!-- Slides -->
+			<#if listImages?has_content>
+			<#list listImages as image>
+				<div class="swiper-slide">
+					<img src="${image.imageBase64!}" alt="" data-id-file="${image.idFile}" data-src="${image.imageBase64!}" class="img-gallery-content"/>
+				</div>	
+			</#list>
+			</#if>
+		</div>
+		<div class="swiper-button-next"></div>
+		<div class="swiper-button-prev"></div>
+	
+		<!-- holder for the fullscreen slider -->
+		<div id="fullscreen-swiper"></div>
+		<div id="fullscreen-swiper-backdrop"></div>
+	</div>
+	<script>
+		var swiper = new Swiper(".navigation", {
+			navigation : {
+				nextEl : ".swiper-button-next",
+				prevEl : ".swiper-button-prev",
+			}
+		});
+	</script>
+</#if>
+
+<#if config?? && config.galleryImageType == 'PAGINATION'>
+	<!-- Pagination -->
+	<div class="pagination swiper">
+		<!-- Additional required wrapper -->
+		<div class="swiper-wrapper">
+			<!-- Slides -->
+			<#if listImages?has_content>
+			<#list listImages as image>
+				<div class="swiper-slide">
+					<img src="${image.imageBase64!}" alt="" data-id-file="${image.idFile}" data-src="${image.imageBase64!}" class="img-gallery-content"/>
+				</div>	
+			</#list>
+			</#if>
+		</div>
+		<div class="swiper-pagination"></div>
+	</div>
+	<script>
+		var swiper = new Swiper(".pagination", {
+			pagination : {
+				el : ".swiper-pagination",
+			}
+		});
+	</script>
+</#if>
+
+<#if config?? && config.galleryImageType == 'PAGINATIONPROGRESS'>
+	<!-- Pagination Progress -->
+	<div class="paginationProgress swiper">
+		<!-- Additional required wrapper -->
+		<div class="swiper-wrapper">
+			<!-- Slides -->
+			<#if listImages?has_content>
+			<#list listImages as image>
+				<div class="swiper-slide">
+					<img src="${image.imageBase64!}" alt="" data-id-file="${image.idFile}" data-src="${image.imageBase64!}" class="img-gallery-content"/>
+				</div>	
+			</#list>
+			</#if>
+		</div>
+		<div class="swiper-button-next"></div>
+		<div class="swiper-button-prev"></div>
+		<div class="swiper-pagination"></div>
+	</div>
+	<script>
+		var swiper = new Swiper(".paginationProgress", {
+			pagination : {
+				el : ".swiper-pagination",
+				type : "progressbar",
+			},
+			navigation : {
+				nextEl : ".swiper-button-next",
+				prevEl : ".swiper-button-prev",
+			}
+		});
+	</script>
+</#if>
+
+<#if config?? && config.galleryImageType == 'SCROLLBAR'>
+	<!-- Scrollbar -->
+	<div class="scrollbar swiper">
+		<!-- Additional required wrapper -->
+		<div class="swiper-wrapper">
+			<!-- Slides -->
+			<#if listImages?has_content>
+			<#list listImages as image>
+				<div class="swiper-slide">
+					<img src="${image.imageBase64!}" alt="" data-id-file="${image.idFile}" data-src="${image.imageBase64!}" class="img-gallery-content"/>
+				</div>	
+			</#list>
+			</#if>
+		</div>
+		<div class="swiper-scrollbar"></div>
+	</div>
+	<script>
+		var swiper = new Swiper(".scrollbar", {
+			scrollbar : {
+				el : ".swiper-scrollbar",
+				hide : true,
+			}
+		});
+	</script>
+</#if>
+
+<#if config?? && config.galleryImageType == 'VERTICAL'>
+	<!-- Vertical -->
+	<div class="vertical swiper">
+		<!-- Additional required wrapper -->
+		<div class="swiper-wrapper">
+			<!-- Slides -->
+			<#if listImages?has_content>
+			<#list listImages as image>
+				<div class="swiper-slide">
+					<img src="${image.imageBase64!}" alt="" data-id-file="${image.idFile}" data-src="${image.imageBase64!}" class="img-gallery-content"/>
+				</div>	
+			</#list>
+			</#if>
+		</div>
+		<div class="swiper-pagination"></div>
+	</div>
+	<script>
+		var swiper = new Swiper(".vertical", {
+			direction : "vertical",
+			pagination : {
+				el : ".swiper-pagination",
+				clickable : true,
+			}
+		});
+	</script>
+</#if>
+
+<#if config?? && config.galleryImageType == 'FREEMODE'>
+	<!-- Freemode -->
+	<div class="freemode swiper">
+		<!-- Additional required wrapper -->
+		<div class="swiper-wrapper">
+			<!-- Slides -->
+			<#if listImages?has_content>
+			<#list listImages as image>
+				<div class="swiper-slide">
+					<img src="${image.imageBase64!}" alt="" data-id-file="${image.idFile}" data-src="${image.imageBase64!}" class="img-gallery-content"/>
+				</div>	
+			</#list>
+			</#if>
+		</div>
+		<div class="swiper-pagination"></div>
+	</div>
+	<script>
+		var swiper = new Swiper(".freemode", {
+			slidesPerView : 3,
+			spaceBetween : 30,
+			freeMode : true,
+			pagination : {
+				el : ".swiper-pagination",
+				clickable : true,
+			}
+		});	
+	</script>
+</#if>
+
+<#if config?? && config.galleryImageType == 'ZOOM'>
+	<!-- Zoom --> 
+	<div class="zoom swiper">
+		<!-- Additional required wrapper -->
+		<div class="swiper-wrapper">
+			<!-- Slides -->
+			<#if listImages?has_content>
+			<#list listImages as image>
+				<div class="swiper-slide">
+					<img src="${image.imageBase64!}" alt="" data-id-file="${image.idFile}" data-src="${image.imageBase64!}" class="img-gallery-content"/>
+				</div>	
+			</#list>
+			</#if>
+		</div>
+		<div class="swiper-button-next"></div>
+		<div class="swiper-button-prev"></div>
+		<div class="swiper-pagination"></div>
+	</div>
+	<script>
+		var swiper = new Swiper(".zoom", {
+			zoom : true,
+			navigation : {
+				nextEl : ".swiper-button-next",
+				prevEl : ".swiper-button-prev",
+			},
+			pagination : {
+				el : ".swiper-pagination",
+				clickable : true,
+			}
+		});
+	</script>
+</#if>
+<#if inputName?? && inputName?has_content>
+<!-- hidden input -->
+<input type="hidden" name="${inputName!}" id="selected-gallery-image" value="${idFileSelected!}"/>
+<!-- Show selected image -->
+<div class="form-files-group" id="selected-image-group" <#if !idFileSelected?has_content>style="display:none;"</#if>>
+	<label>#i18n{galleryimage.gallery_image.image_selected}</label>
+	<div class="col-md-12">
+		<img id="src-selected-image" alt="" width="80" height="80" <#if idFileSelected?? && idFileSelected?has_content> src="image?resource_type=public_image_resource&id=${idFileSelected!}" </#if>>
+		<button type="button" class="btn btn-danger btn-sm" id="delete-selected-image" >#i18n{galleryimage.gallery_image.remove_image_selected}</button>
+	</div>
+</div>
+</#if>
+
+<script>
+	var parginator = '${pagesCount!}'
+	var index = '${index!}';
+		
+	swiper.on('reachEnd', function () {
+		if ( index < parginator){
+			index++;			
+			var request = $.ajax( { 
+				url : 'servlet/plugins/galleryimage',
+				type : 'GET',
+				data : {codeGallery:'${config.codeGallery!}', index:index},
+				dataType : 'html'
+			} );
+			
+			request.done( function ( content ) {
+				swiper.appendSlide([content]);
+			} );
+		}
+	});
+
+	<#if inputName?? && inputName?has_content>
+	swiper.on('click', function () {
+		var dataset = this.clickedSlide.firstElementChild.dataset.idFile;
+		$("#selected-gallery-image").val(dataset);
+		//Seleted image
+		$('#src-selected-image').attr('src',this.clickedSlide.firstElementChild.dataset.src);
+		$('#selected-image-group').show();
+	});
+	
+	$('#delete-selected-image').click( function ( ){
+		$('#selected-image-group').hide();
+		$("#selected-gallery-image").val(null);
+	});
+	</#if>
+</script>
+<style>
+.swiper {
+	width: ${(config.widthGallery)!}px;
+	height: ${(config.heightGallery)!}px;
+}
+
+.swiper-slide img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+.next-btn{
+	right: 10px;
+    left: auto;
+	position: absolute;
+    bottom: 0;
+    width: calc(var(--swiper-navigation-size)/ 44 * 27);
+    height: var(--swiper-navigation-size);
+    margin-top: calc(0px - (var(--swiper-navigation-size)/ 2));
+    z-index: 10;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--swiper-navigation-color,var(--swiper-theme-color));
+}
+.previous-btn{
+	left: 20px;
+	position: absolute;
+    bottom: 0;
+    width: calc(var(--swiper-navigation-size)/ 44 * 27);
+    height: var(--swiper-navigation-size);
+    margin-top: calc(0px - (var(--swiper-navigation-size)/ 2));
+    z-index: 10;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--swiper-navigation-color,var(--swiper-theme-color));
+}
+</style>

@@ -1,0 +1,70 @@
+<@row>
+	<@columns>
+		<@box color='info'>
+			<@boxHeader title='#i18n{galleryimage.create_gallery_image.title}' boxTools=true skipHeader=false>
+			</@boxHeader>
+			<@boxBody>
+				<@tform action='jsp/admin/plugins/galleryimage/ManageGallery.jsp?action=modifyGalleryImage' method='post' >
+					<@input type='hidden' name='idGallery' value='${(config.idGallery)!}'></@input>
+					<@formGroup labelKey='#i18n{galleryimage.create_gallery_image.codeGallery}' helpKey='#i18n{galleryimage.create_gallery_image.codeGalleryHelp}' max=255 mandatory=true>
+						<@input id="codeGallery" type='text' name='codeGallery' value='${(config.codeGallery)!}' readonly=true mandatory=mandatory></@input>
+					</@formGroup>
+					<@formGroup labelKey='#i18n{galleryimage.create_gallery_image.label}' helpKey='#i18n{galleryimage.create_gallery_image.labelHelp}' max=255 mandatory=true>
+						<@input type='text' name='label' value='${(config.label)!}' mandatory=mandatory></@input>
+					</@formGroup>
+							
+					<@formGroup labelKey='#i18n{galleryimage.create_gallery_image.typeGallery}' helpKey='#i18n{galleryimage.create_gallery_image.typeGalleryHelp}' mandatory=true>
+						<@inputGroup>
+						    <@select id="typeGallery" default_value="${(config.galleryImageType)!}" name='galleryImageType' items=refListGallerytype />
+						</@inputGroup>
+					</@formGroup>
+					
+					<@formGroup labelKey='#i18n{galleryimage.create_gallery_image.height}' helpKey='#i18n{galleryimage.create_gallery_image.heightHelp}' max=255 mandatory=true>
+						<@input type='number' id="height" name='heightGallery' value='${(config.heightGallery)!500}' mandatory=mandatory></@input>
+					</@formGroup>
+		
+					<@formGroup labelKey='#i18n{galleryimage.create_gallery_image.width}' helpKey='#i18n{galleryimage.create_gallery_image.widthHelp}' max=255mandatory=true>
+						<@input type='number' id="width" name='widthGallery' value='${(config.widthGallery)!850}' mandatory=mandatory></@input>
+					</@formGroup>
+					
+					<@formGroup rows=2 labelKey='#i18n{galleryimage.create_gallery_image.labelAuthenticatedMode}' labelFor='authenticatedMode' >
+						<@radioButton labelKey='#i18n{galleryimage.create_gallery_image.labelAuthenticatedMode.enable}' name="authenticatedMode" value="true" params=((feedbackConfig?? && feedbackConfig.authenticatedMode )?string('checked=true','false')!) />
+						<@radioButton labelKey='#i18n{galleryimage.create_gallery_image.labelAuthenticatedMode.disable}' name="authenticatedMode"  value="false" params=((feedbackConfig?? && !feedbackConfig.authenticatedMode )?string('checked=true','false')!)/>
+					</@formGroup>
+					
+					<!-- Prévisualisation -->
+					<@div class="bg-light pt-2 pb-4 text-center">
+						<#include "preview_gallery_image.html"/>
+					</@div>
+					<@div class="text-center">
+						<@button color='primary' size='lg' type="submit" title='#i18n{galleryimage.create_gallery_image.save}' />
+					</@div>
+				</@tform>
+			</@boxBody>
+		</@box>
+	</@columns>
+</@row>
+<script>
+	//Preview gallery type
+	$('.swiper').hide( );
+	var value = $('#typeGallery').val() ;
+	$('.' + value).show();
+	
+	$('#typeGallery').change( function(){
+		var value = $(this).val() ;
+		$('.swiper').hide( );
+		$('.' + value).show();
+	});
+	
+	//root
+	let root = document.documentElement;
+	
+	$('#height').change( function(){
+		root.style.setProperty('--heightSwiper', $(this).val( ) + 'px' );
+	});
+	
+	$('#width').change( function(){
+		root.style.setProperty('--widthSwiper', $(this).val( ) + 'px' );
+	});
+	
+</script>

@@ -1,0 +1,63 @@
+<#escape x as x?html>
+	<@tform method='post' action='jsp/admin/plugins/galleryimage/DoCreateImage.jsp' enctype='multipart/form-data'>
+		<@input type='hidden' name='id_gallery' value="${idGallery!}" />
+		<@row>
+			<@columns lg=6>
+				<@box>
+					#i18n{galleryimage.create_image.title}
+					<@boxHeader title=boxHeaderTitle />
+					<@boxBody> 
+						<@formGroup labelFor='image_title' labelKey='#i18n{galleryimage.create_image.labelImageTitle}' helpKey='#i18n{galleryimage.create_image.labelImageTitleHelp}' mandatory=true rows=2>
+							<@input type='text' name='title' id='image_title' />
+						</@formGroup>
+						<@formGroup labelFor='image_summary' labelKey='#i18n{galleryimage.create_image.labelImageSummary}' helpKey='#i18n{galleryimage.create_image.labelImageSummaryHelp}' mandatory=true rows=2>
+							<@input type='textarea' name='description' id='description' />
+						</@formGroup>
+						<@fieldSet legend='#i18n{galleryimage.create_image.attributTitle}'>
+							<#noescape>
+							<@formGroup formStyle='inline' labelFor='image' labelKey='' helpKey='' checked=true>
+								<@inputGroup>
+								<@input type='file' name='image' id='image' />
+								<span class="input-group-addon">
+									<@checkBox labelFor='image_croppable' labelKey='#i18n{galleryimage.create_image.attributeType.image.resize}' name='image_croppable' id='crop' />
+								</span>
+								</@inputGroup>
+								</@formGroup>
+								<@formGroup formStyle='' labelFor='image_width' labelKey='#i18n{galleryimage.create_image.attributeType.image.width}' id="crop_group">
+								<@inputGroup params='style="width:20%"'>
+									<@input type='number' name='image_width' value='' placeHolder='#i18n{galleryimage.create_image.attributeType.image.width}' id='image_width' />
+									<span class="input-group-addon">px<span>
+								</@inputGroup>
+							</@formGroup>
+							</#noescape>
+							<@formGroup rows=2>
+								<@button type='submit' title='#i18n{galleryimage.create_image.buttonCreate}' buttonIcon='check' />
+								<@button type='button' params='onclick="javascript:history.go(-1)"' title='#i18n{portal.admin.message.buttonCancel}' buttonIcon='times' color='default' />
+							</@formGroup>
+						</@fieldSet>
+					</@boxBody>
+				</@box>
+			</@columns>
+		</@row>
+	</@tform>
+</#escape>
+<#include "/admin/util/editor/editor.html" />
+<@initEditor />
+<script>
+$( function(){
+ 	$('#crop_group').toggle();
+	$("#image_width").prop({disabled: true});
+	$("#image_width").addClass('disabled');
+	$('#crop').on('click', function(){
+		$('#crop_group').toggle();
+		if ( $(this).is(':checked') ) {
+			$("#image_width").prop({disabled: false});
+			$("#image_width").toggleClass("disabled");
+		} else {
+			$("#image_width").val("");
+			$("#image_width").prop({disabled: true});
+			$("#image_width").toggleClass("disabled");
+		}
+	});
+});
+</script>

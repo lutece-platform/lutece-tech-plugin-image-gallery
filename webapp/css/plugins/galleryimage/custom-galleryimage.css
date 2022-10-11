@@ -1,0 +1,17 @@
+.galleryimage-selector{ margin: 15px; }
+.galleryimage-selector .nav.nav-tabs{ margin: 5px }
+.galleryimage-selector .nav.nav-tabs .navbar-right button{ margin-right: 30px }
+.galleryimage-selector .tab-content{ margin: 15px 30px }
+.galleryimage-selector .tab-content .add-resource{ position: absolute; right: 15px; top: 15px }
+.galleryimage-selector .galleryimage-container { display: flex; justify-content: flex-start; flex-wrap: wrap; border-radius: 4px; overflow: hidden; gap: 5px 0; }
+.galleryimage-selector .galleryimage { display: flex; flex-direction: column; border-radius: 4px; align-items: left; margin: 5px; padding: 0; width: 250px; background: #fff; box-shadow: 0px 3px 10px 1px rgba(0, 0, 0, 0.1);}
+.galleryimage-selector .galleryimage-image { position: relative; width: 100%;  display: block; max-width: 250px; height: 200px; border-top-left-radius: 4px; border-top-right-radius: 4px; overflow: hidden;}
+.galleryimage-selector .galleryimage-image img { width: 100%;  height: 100%; display: block;}
+.galleryimage-selector .galleryimage-image:hover { cursor: pointer;}
+.galleryimage-selector .galleryimage-image:hover:after { bottom: 0; color: #fff; text-shadow: 1px 0px 12px #000000;; transition: all 0.15s; }
+.galleryimage-selector .galleryimage-image:hover .galleryimage-overlay { background-color: #16ff0170; transition: all 0.15s; }
+.galleryimage-selector .galleryimage-image:after { display: flex; justify-content: center; align-items: center; bottom: -4em; position: absolute; width: 100%; height: 100%; font-family: "FontAwesome"; font-size: 1em; text-align: center; content: ""; transition: all 0.15s;}
+.galleryimage-selector .galleryimage-image .galleryimage-overlay { display: block; position: absolute; width: 100%; height: 200px; top: 0; left: 0; content: ""; background-color: rgba 255, 255, 255, 0; transition: backgroundColor, 0.15s; }
+.galleryimage-selector .galleryimage-desc{ text-align: center; padding: 5px; color: #000; white-space: nowrap; overflow: hidden;  text-overflow: ellipsis; }
+.galleryimage-selector .galleryimage-desc:hover{ color: rgb(99, 99, 99); transition: all 0.15s; }
+.galleryimage-selector .footer{ margin: 0; padding: 0; position: absolute; bottom: 0; width: 90%; }
