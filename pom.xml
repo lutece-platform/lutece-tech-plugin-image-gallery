@@ -13,7 +13,7 @@
     <artifactId>plugin-galleryimage</artifactId>
     <packaging>lutece-plugin</packaging>
     
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.1</version>
     <name>Lutece galleryimage plugin</name>
 
     <repositories>
@@ -66,6 +66,6 @@
        <connection>scm:git:https://github.com/lutece-platform/lutece-tech-plugin-image-gallery.git</connection>
        <developerConnection>scm:git:https://github.com/lutece-platform/lutece-tech-plugin-image-gallery.git</developerConnection>
        <url>https://github.com/lutece-platform/lutece-tech-plugin-image-gallery.git</url>
-       <tag>HEAD</tag>
+       <tag>plugin-galleryimage-1.0.1</tag>
   </scm>
 </project>
