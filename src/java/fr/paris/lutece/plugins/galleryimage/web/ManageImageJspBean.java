@@ -50,12 +50,14 @@ import fr.paris.lutece.plugins.galleryimage.service.IImageService;
 import fr.paris.lutece.plugins.galleryimage.util.ImageUtils;
 import fr.paris.lutece.portal.business.rbac.RBAC;
 import fr.paris.lutece.portal.service.file.FileService;
+import fr.paris.lutece.portal.service.file.FileServiceException;
 import fr.paris.lutece.portal.service.fileimage.FileImagePublicService;
 import fr.paris.lutece.portal.service.message.AdminMessage;
 import fr.paris.lutece.portal.service.message.AdminMessageService;
 import fr.paris.lutece.portal.service.rbac.RBACService;
 import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
+import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.service.util.AppPathService;
 import fr.paris.lutece.portal.web.admin.PluginAdminPageJspBean;
 import fr.paris.lutece.portal.web.upload.MultipartHttpServletRequest;
@@ -262,7 +264,14 @@ public class ManageImageJspBean extends PluginAdminPageJspBean
                 }
 
                 FileImagePublicService.init( );
-                FileService.getInstance( ).getFileStoreServiceProvider( ).delete( String.valueOf( image.getIdFile( ) ) );
+                try
+                {
+                	FileService.getInstance( ).getFileStoreServiceProvider( ).delete( String.valueOf( image.getIdFile( ) ) );
+                }
+                catch( FileServiceException e )
+                {
+                	AppLogService.error( e );
+                }
 
                 image.setIdFile( Integer.parseInt( FileImagePublicService.getInstance( ).addImageResource( fileParameterBinaryValue ) ) );
             }
@@ -296,7 +305,14 @@ public class ManageImageJspBean extends PluginAdminPageJspBean
         {
             Image image = _imageService.findByPrimaryKey( Integer.parseInt( strIdImage ) );
 
-            FileService.getInstance( ).getFileStoreServiceProvider( ).delete( String.valueOf( image.getIdFile( ) ) );
+            try
+            {
+            	FileService.getInstance( ).getFileStoreServiceProvider( ).delete( String.valueOf( image.getIdFile( ) ) );
+            }
+            catch( FileServiceException e )
+            {
+            	AppLogService.error( e );
+            }
 
             GalleryImageHome.removeByImageId( image.getIdImage( ) );
             _imageService.remove( image.getIdImage( ) );
