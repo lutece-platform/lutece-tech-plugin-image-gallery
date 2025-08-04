@@ -1,3 +1,6 @@
+-- liquibase formatted sql
+-- changeset galleryimage:create_db_galleryimage.sql
+-- preconditions onFail:MARK_RAN onError:WARN
 --
 -- Structure for table galleryimage_gallery
 --
