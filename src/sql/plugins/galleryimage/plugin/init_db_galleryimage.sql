@@ -1,3 +1,6 @@
+-- liquibase formatted sql
+-- changeset galleryimage:init_db_galleryimage.sql
+-- preconditions onFail:MARK_RAN onError:WARN
 --
 -- Data for table core_admin_right
 --
