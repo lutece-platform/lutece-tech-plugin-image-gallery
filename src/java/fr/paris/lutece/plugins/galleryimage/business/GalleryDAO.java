@@ -35,6 +35,7 @@ package fr.paris.lutece.plugins.galleryimage.business;
 
 import fr.paris.lutece.plugins.galleryimage.service.GalleryImagePlugin;
 import fr.paris.lutece.util.sql.DAOUtil;
+import jakarta.enterprise.context.ApplicationScoped;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,6 +44,7 @@ import java.sql.Statement;
 /**
  * This class provides Data Access methods for GalleryDAO objects
  */
+@ApplicationScoped
 public final class GalleryDAO implements IGalleryDAO
 {
     // Constants

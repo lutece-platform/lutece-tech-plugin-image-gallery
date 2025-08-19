@@ -39,10 +39,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -92,7 +92,7 @@ public class GalleryImageServlet extends HttpServlet
     private static final String PARAMTER_ID_FILE = "idFileSelected";
 
     // PROPERTY
-    private static final String PROPERTY_NB_ITEMS = "galleryimage.paginator.gallery.front.numberOfItems";
+    private static final String PROPERTY_NB_ITEMS = "galleryimage.paginator.gallery.front.numberOfItemsPerPage";
     private static final String UNAUTHORIZED = "unauthorized";
     
     /**

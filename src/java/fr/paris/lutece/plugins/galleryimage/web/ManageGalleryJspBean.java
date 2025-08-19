@@ -34,18 +34,17 @@
 package fr.paris.lutece.plugins.galleryimage.web;
 
 import java.security.GeneralSecurityException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Named;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
-
-import com.rometools.rome.io.impl.Base64;
 
 import fr.paris.lutece.api.user.User;
 import fr.paris.lutece.plugins.galleryimage.business.Gallery;
@@ -58,7 +57,6 @@ import fr.paris.lutece.plugins.galleryimage.util.EnumGalleryImageType;
 import fr.paris.lutece.portal.business.rbac.RBAC;
 import fr.paris.lutece.portal.service.admin.AccessDeniedException;
 import fr.paris.lutece.portal.service.rbac.RBACService;
-import fr.paris.lutece.portal.service.security.RsaService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.portal.service.util.AppPathService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
@@ -71,7 +69,9 @@ import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.html.AbstractPaginator;
 import fr.paris.lutece.util.html.HtmlTemplate;
 
-@Controller( controllerJsp = "ManageGallery.jsp", controllerPath = "jsp/admin/plugins/galleryImage/", right = ManageGalleryJspBean.RIGHT_GALLERY_IMAGE_MANAGEMENT )
+@RequestScoped
+@Named
+@Controller( controllerJsp = "ManageGallery.jsp", controllerPath = "jsp/admin/plugins/galleryimage/", right = ManageGalleryJspBean.RIGHT_GALLERY_IMAGE_MANAGEMENT )
 public class ManageGalleryJspBean extends MVCAdminJspBean
 {
     public static final String  RIGHT_GALLERY_IMAGE_MANAGEMENT      = "GALLERY_IMAGE_MANAGEMENT";
@@ -88,7 +88,7 @@ public class ManageGalleryJspBean extends MVCAdminJspBean
     private static final String VIEW_CREATE_GALLERY_IMAGE           = "createGalleryImage";
     private static final String VIEW_MODIFY_GALLERY_IMAGE           = "modifyGalleryImage";
     private static final String VIEW_SELECT_LIST_GALLERY            = "selectListGallery";
-    private static final String VIEW_LIST_GALLERY_IMAGE             = "listImagesGallery";
+    public static final String VIEW_LIST_GALLERY_IMAGE             = "listImagesGallery";
 
     // ACTION
     private static final String ACTION_CREATE_GALLERY_IMAGE         = "createGalleryImage";
@@ -114,7 +114,7 @@ public class ManageGalleryJspBean extends MVCAdminJspBean
     // PARAMETER
     private static final String PARAMETER_ID                        = "id";
     private static final String PARAMETER_ID_IMAGE                  = "idImage";
-    private static final String PROPERTY_NUMBER_OF_DEMAND_PER_PAGE  = "galleryimage.paginator.image_gallery.numberOfItemsPerPage";
+    private static final String PROPERTY_NUMBER_OF_DEMAND_PER_PAGE  = "galleryimage.paginator.gallery.back.numberOfItemsPerPage";
 
     // CONSTANTS
     private static final String CURRENT_PAGE_INDEX_IMAGE            = "current_page_index_image";
@@ -131,7 +131,7 @@ public class ManageGalleryJspBean extends MVCAdminJspBean
     public String getManageGalleryImage( HttpServletRequest request )
     {
         Locale locale = getLocale( );
-        Map<String, Object> model = new HashMap<>( );
+        Map<String, Object> model = getModel( );
 
         model.put( MARK_LIST_GALLERY_IMAGE_CONFIG, GalleryHome.findAll( ) );
 
@@ -149,7 +149,7 @@ public class ManageGalleryJspBean extends MVCAdminJspBean
         }
 
         Locale locale = getLocale( );
-        Map<String, Object> model = new HashMap<>( );
+        Map<String, Object> model = getModel( );
 
         model.put( MARK_LIST_GALLERY_TYPE, EnumGalleryImageType.getReferenceList( ) );
 
@@ -162,7 +162,7 @@ public class ManageGalleryJspBean extends MVCAdminJspBean
     public String getModifyGalleryImage( HttpServletRequest request ) throws AccessDeniedException
     {
         Locale locale = getLocale( );
-        Map<String, Object> model = new HashMap<>( );
+        Map<String, Object> model = getModel( );
 
         String strIdGalleryImageConfig = request.getParameter( PARAMETER_ID );
 
@@ -223,7 +223,7 @@ public class ManageGalleryJspBean extends MVCAdminJspBean
         return getManageGalleryImage( request );
     }
 
-    @Action( ACTION_DELETE_GALLERY_IMAGE )
+    @Action( value = ACTION_DELETE_GALLERY_IMAGE, securityTokenDisabled = true )
     public String doDeleteGalleryImage( HttpServletRequest request ) throws AccessDeniedException
     {
         String strIdGalleryImageConfig = request.getParameter( PARAMETER_ID );
@@ -259,7 +259,7 @@ public class ManageGalleryJspBean extends MVCAdminJspBean
         if ( StringUtils.isNumeric( strIdGallery ) )
         {
             Locale locale = getLocale( );
-            Map<String, Object> model = new HashMap<>( );
+            Map<String, Object> model = getModel( );
             Gallery config = GalleryHome.find( Integer.parseInt( strIdGallery ) );
 
             if ( !RBACService.isAuthorized( Gallery.RESOURCE_TYPE, config.getCodeGallery( ), Gallery.PERMISSION_MANAGE_GALLERY_IMAGE, ( User ) getUser( ) ) )
@@ -366,7 +366,7 @@ public class ManageGalleryJspBean extends MVCAdminJspBean
     @View( VIEW_SELECT_LIST_GALLERY )
     public String getListGallery( HttpServletRequest request )
     {
-        Map<String, Object> model = new HashMap<>( );
+        Map<String, Object> model = getModel( );
         ReferenceList refList = new ReferenceList( );
 
         for ( Gallery gallery : GalleryHome.findAll( ) )

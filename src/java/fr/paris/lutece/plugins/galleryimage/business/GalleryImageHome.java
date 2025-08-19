@@ -33,8 +33,9 @@
  */
 package fr.paris.lutece.plugins.galleryimage.business;
 
-import fr.paris.lutece.portal.service.spring.SpringContextService;
 import java.util.List;
+
+import jakarta.enterprise.inject.spi.CDI;
 
 /**
  * This class provides instances management methods (create, find, ...) for GalleryImage objects
@@ -44,7 +45,7 @@ public final class GalleryImageHome
 {
 
     // Static variable pointed at the DAO instance
-    private static IGalleryImageDAO _dao = (IGalleryImageDAO) SpringContextService.getBean( "galleryimage.galleryImageDAO" );
+    private static IGalleryImageDAO _dao = CDI.current( ).select( IGalleryImageDAO.class ).get( );
 
     /**
      * Private constructor - this class need not be instantiated
