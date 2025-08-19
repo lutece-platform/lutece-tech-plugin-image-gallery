@@ -39,11 +39,14 @@ import java.util.List;
 import fr.paris.lutece.plugins.galleryimage.business.Image;
 import fr.paris.lutece.plugins.galleryimage.business.ImageHome;
 
+import jakarta.enterprise.context.ApplicationScoped;
+
 /**
  * 
  * ImageService
  *
  */
+@ApplicationScoped
 public class ImageService implements IImageService
 {
     @Override

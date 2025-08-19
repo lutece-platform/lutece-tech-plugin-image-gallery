@@ -33,11 +33,10 @@
  */
 package fr.paris.lutece.plugins.galleryimage.util;
 
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileItemFactory;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+
 import org.apache.commons.imaging.ImageInfo;
 import org.apache.commons.imaging.ImageParser;
+import org.apache.commons.imaging.ImageReadException;
 import org.apache.commons.imaging.Imaging;
 import org.apache.commons.imaging.formats.bmp.BmpImageParser;
 import org.apache.commons.imaging.formats.dcx.DcxImageParser;
@@ -57,7 +56,7 @@ import fr.paris.lutece.portal.service.util.AppLogService;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
-
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -82,78 +81,61 @@ public final class ImageUtils
     private ImageUtils( )
     {
     }
-
+ 
     /**
-     * resizeImage
+     * Build an outputStream of an image from its byte array. If strImageWidth parameter is filled in, the image is resized according to this width
      * 
-     * @param fileItem
-     * @param width
-     * @return fileItem
+     * @param fileImage
+     *           image byte array
+     * @param strImageWidth 
+     *           image width
+     * @return image outputStream
      */
-    public static FileItem resizeImage( FileItem fileItem, int width )
+    public static ByteArrayOutputStream getImageOutputStream( byte[ ] fileImage, String strImageWidth )
     {
-        // Crop image if needed
-        try
+    	ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
+    	try( ByteArrayInputStream inputStream = new ByteArrayInputStream( fileImage ) )
         {
-            ByteArrayOutputStream out = new ByteArrayOutputStream( );
-            BufferedImage image = ImageIO.read( fileItem.getInputStream( ) );
-            BufferedImage resizedImage = Scalr.resize( image, Scalr.Mode.FIT_TO_WIDTH, width );
-            ImageIO.write( resizedImage, PARAMETER_JPG, out );
-
-            return createFileItem( out.toByteArray( ), fileItem.getFieldName( ), fileItem.getContentType( ), fileItem.getName( ) );
+            BufferedImage image = ImageIO.read( inputStream );
+            if( strImageWidth != null )
+            {
+            	image = Scalr.resize( image, Scalr.Mode.FIT_TO_WIDTH, Integer.parseInt( strImageWidth ) );
+            }
+            ImageIO.write( image, PARAMETER_JPG, outputStream );            
         }
         catch( Exception e )
         {
-            AppLogService.error( "ImageUtils:resizeImage( ): {} ", e.getMessage( ), e );
+            AppLogService.error( "ImageUtils:getImageOutputStream( ): {} ", e.getMessage( ), e );
         }
-        return fileItem;
+    	return outputStream;
     }
 
     /**
-     * Create a FileItem with the specfied content bytes.
-     */
-    private static FileItem createFileItem( byte [ ] contentBytes, String strFieldName, String strContentType, String strFileName )
-    {
-        FileItemFactory factory = new DiskFileItemFactory( );
-        FileItem item = factory.createItem( strFieldName, strContentType, false, strFileName );
-
-        try
-        {
-            OutputStream os = item.getOutputStream( );
-            os.write( contentBytes );
-            os.close( );
-        }
-        catch( IOException e )
-        {
-            AppLogService.error( "ImageUtils:createFileItem( ): {} ", e.getMessage( ), e );
-        }
-        return item;
-    }
-
-    /**
-     * Check if the parameter fileItem is safe
+     * Checks if the image is safe
      * 
-     * @param fileItem
-     * @return true if file is safe
+     * @param fileImage
+     *           image byte array
+     * @return true if file is safe, false otherwise
      */
-    public static boolean safeImage( FileItem fileItem )
+    public static boolean safeImage( byte[ ] fileImage )
     {
         boolean safeState = false;
         boolean fallbackOnApacheCommonsImaging;
         try
         {
-            if ( fileItem != null )
+            if ( fileImage != null )
             {
                 // Get the image format
                 String formatName;
-                try ( ImageInputStream iis = ImageIO.createImageInputStream( fileItem.getInputStream( ) ) )
+                try (   ByteArrayInputStream bis = new ByteArrayInputStream( fileImage );
+                		ImageInputStream iis = ImageIO.createImageInputStream( bis ) )
                 {
                     Iterator<ImageReader> imageReaderIterator = ImageIO.getImageReaders( iis );
                     // If there not ImageReader instance found so it's means that the current
                     // format is not supported by the Java built-in API
                     if ( !imageReaderIterator.hasNext( ) )
                     {
-                        ImageInfo imageInfo = Imaging.getImageInfo( fileItem.get( ) );
+                        ImageInfo imageInfo = Imaging.getImageInfo( fileImage );
                         if ( imageInfo != null && imageInfo.getFormat( ) != null && imageInfo.getFormat( ).getName( ) != null )
                         {
                             formatName = imageInfo.getFormat( ).getName( );
@@ -172,22 +154,7 @@ public final class ImageUtils
                     }
                 }
 
-                // Load the image
-                BufferedImage originalImage;
-                if ( !fallbackOnApacheCommonsImaging )
-                {
-                    originalImage = ImageIO.read( fileItem.getInputStream( ) );
-                }
-                else
-                {
-                    originalImage = Imaging.getBufferedImage( fileItem.getInputStream( ) );
-                }
-
-                // Check that image has been successfully loaded
-                if ( originalImage == null )
-                {
-                    throw new IOException( "Cannot load the original image !" );
-                }
+                BufferedImage originalImage = loadImage( fileImage, fallbackOnApacheCommonsImaging );       
 
                 // Get current Width and Height of the image
                 int originalWidth = originalImage.getWidth( null );
@@ -290,6 +257,42 @@ public final class ImageUtils
         return safeState;
     }
 
+    /**
+     * Returns a buffered image from the image byte array passed in parameter. fallbackOnApacheCommonsImaging parameter indicates which API will be used to read 
+     * the file : Java standard API or Apache Commons Imaging. If it is equals to true, Java Standard API will not be able to read the file so Apache commons Imaging 
+     * will be used to try to read the file.
+     * 
+     * @param fileImage
+     *           image byte array
+     * @param fallbackOnApacheCommonsImaging
+     *           true if Apache Commons Imaging will be used to try to read the file, false if Java Standard API will be used
+     * @return buffered image
+     * @throws IOException
+     * @throws ImageReadException
+     */
+    private static BufferedImage loadImage( byte[ ] fileImage, boolean fallbackOnApacheCommonsImaging ) throws IOException, ImageReadException
+    {
+    	BufferedImage originalImage;
+        try ( ByteArrayInputStream bis = new ByteArrayInputStream( fileImage ) )
+        {
+        	if ( !fallbackOnApacheCommonsImaging )
+            {
+                originalImage = ImageIO.read( bis );
+            }
+            else
+            {
+                originalImage = Imaging.getBufferedImage( bis );
+            }
+
+            // Check that image has been successfully loaded
+            if ( originalImage == null )
+            {
+                throw new IOException( "Cannot load the original image !" );
+            }
+        }
+        return originalImage;
+    }
+    
     /**
      * imageBase64
      * @param imageResource

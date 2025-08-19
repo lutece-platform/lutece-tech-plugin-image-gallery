@@ -1,5 +1,5 @@
 <#escape x as x?html>
-	<@tform method='post' action='jsp/admin/plugins/galleryimage/DoCreateImage.jsp' enctype='multipart/form-data'>
+	<@tform method='post' action='jsp/admin/plugins/galleryimage/ManageImage.jsp' enctype='multipart/form-data'>
 		<@input type='hidden' name='id_gallery' value="${idGallery!}" />
 		<@row>
 			<@columns lg=6>
@@ -31,8 +31,8 @@
 							</@formGroup>
 							</#noescape>
 							<@formGroup rows=2>
-								<@button type='submit' title='#i18n{galleryimage.create_image.buttonCreate}' buttonIcon='check' />
-								<@button type='button' params='onclick="javascript:history.go(-1)"' title='#i18n{portal.admin.message.buttonCancel}' buttonIcon='times' color='default' />
+								<@button type='submit' name='action_createImage' title='#i18n{galleryimage.create_image.buttonCreate}' buttonIcon='check' />
+								<@button type='submit' name='view_manageImage' title='#i18n{portal.admin.message.buttonCancel}' buttonIcon='times' color='default' cancel=true />
 							</@formGroup>
 						</@fieldSet>
 					</@boxBody>

@@ -35,7 +35,7 @@ package fr.paris.lutece.plugins.galleryimage.business;
 
 import java.util.List;
 
-import fr.paris.lutece.portal.service.spring.SpringContextService;
+import jakarta.enterprise.inject.spi.CDI;
 
 /**
  * 
@@ -44,7 +44,7 @@ import fr.paris.lutece.portal.service.spring.SpringContextService;
  */
 public final class GalleryHome
 {
-    private static IGalleryDAO _galleryDAO = SpringContextService.getBean( "galleryimage.galleryDAO" );
+    private static IGalleryDAO _galleryDAO = CDI.current( ).select( IGalleryDAO.class ).get( );
 
     /**
      * Private constructor

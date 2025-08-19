@@ -33,16 +33,13 @@
  */
 package fr.paris.lutece.plugins.galleryimage.business;
 
+import java.util.List;
+
 import fr.paris.lutece.plugins.galleryimage.service.GalleryImagePlugin;
 import fr.paris.lutece.plugins.galleryimage.util.ImageUtils;
 import fr.paris.lutece.portal.service.fileimage.FileImagePublicService;
 import fr.paris.lutece.portal.service.image.ImageResource;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
-import fr.paris.lutece.portal.service.util.AppPropertiesService;
-
-import java.util.List;
-
-import com.google.common.collect.Lists;
+import jakarta.enterprise.inject.spi.CDI;
 
 /**
  *  This class provides instances management methods (create, find, ...) for Image objects
@@ -50,7 +47,7 @@ import com.google.common.collect.Lists;
 public final class ImageHome
 {
     // Static variable pointed at the DAO instance
-    private static IImageDAO _dao = (IImageDAO) SpringContextService.getBean( "galleryimage.imageDAO" );
+    private static IImageDAO _dao = CDI.current( ).select( IImageDAO.class ).get( );
     
     /**
      * Private constructor

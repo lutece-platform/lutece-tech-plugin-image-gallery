@@ -33,14 +33,13 @@
  */
 package fr.paris.lutece.plugins.galleryimage.web;
 
-import java.util.HashMap;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.lang3.StringUtils;
 
 import fr.paris.lutece.api.user.User;
@@ -48,35 +47,52 @@ import fr.paris.lutece.plugins.galleryimage.business.GalleryImageHome;
 import fr.paris.lutece.plugins.galleryimage.business.Image;
 import fr.paris.lutece.plugins.galleryimage.service.IImageService;
 import fr.paris.lutece.plugins.galleryimage.util.ImageUtils;
+import fr.paris.lutece.portal.business.file.File;
+import fr.paris.lutece.portal.business.physicalfile.PhysicalFile;
 import fr.paris.lutece.portal.business.rbac.RBAC;
 import fr.paris.lutece.portal.service.file.FileService;
 import fr.paris.lutece.portal.service.file.FileServiceException;
-import fr.paris.lutece.portal.service.fileimage.FileImagePublicService;
+import fr.paris.lutece.portal.service.file.IFileStoreServiceProvider;
 import fr.paris.lutece.portal.service.message.AdminMessage;
 import fr.paris.lutece.portal.service.message.AdminMessageService;
 import fr.paris.lutece.portal.service.rbac.RBACService;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
+import fr.paris.lutece.portal.service.upload.MultipartItem;
 import fr.paris.lutece.portal.service.util.AppLogService;
-import fr.paris.lutece.portal.service.util.AppPathService;
-import fr.paris.lutece.portal.web.admin.PluginAdminPageJspBean;
+import fr.paris.lutece.portal.util.mvc.admin.MVCAdminJspBean;
+import fr.paris.lutece.portal.util.mvc.admin.annotations.Controller;
+import fr.paris.lutece.portal.util.mvc.commons.annotations.Action;
+import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
 import fr.paris.lutece.portal.web.upload.MultipartHttpServletRequest;
 import fr.paris.lutece.util.html.HtmlTemplate;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.servlet.http.HttpServletRequest;
 
-public class ManageImageJspBean extends PluginAdminPageJspBean
+@RequestScoped
+@Named
+@Controller( controllerJsp = "ManageImage.jsp", controllerPath = "jsp/admin/plugins/galleryimage/", right = ManageGalleryJspBean.RIGHT_GALLERY_IMAGE_MANAGEMENT )
+public class ManageImageJspBean extends MVCAdminJspBean
 {
 
     public static final String RIGHT_GALLERY_IMAGE_MANAGEMENT = "GALLERY_IMAGE_MANAGEMENT";
-
-    // JSP
-    private static final String JSP_LIST_IMAGE = "/jsp/admin/plugins/galleryimage/GetListImage.jsp";
-    private static final String JSP_MANAGE_IMAGE_OF_GALLERY = "jsp/admin/plugins/galleryimage/ManageGallery.jsp?view=listImagesGallery&id=";
     
     // TEMPLATE
     private static final String TEMPLATE_SAVE_IMAGE = "admin/plugins/galleryimage/manageimage/save_image.html";
     private static final String TEMPLATE_LIST_IMAGE = "admin/plugins/galleryimage/manageimage/list_image.html";
     private static final String TEMPLATE_MODIFY_IMAGE = "admin/plugins/galleryimage/manageimage/modify_image.html";
 
+    // VIEWS
+    private static final String VIEW_MANAGE_IMAGE = "manageImage";
+    private static final String VIEW_CREATE_IMAGE = "createImage";
+    private static final String VIEW_MODIFY_IMAGE = "modifyImage";
+    
+    // ACTIONS
+    private static final String ACTION_CREATE_IMAGE = "createImage";
+    private static final String ACTION_MODIFY_IMAGE = "modifyImage";
+    private static final String ACTION_DELETE_IMAGE = "deleteImage";
+    
     // MARKS
     private static final String MARK_IMAGE = "image";
     private static final String MARK_LIST_IMAGE = "listImage";
@@ -87,13 +103,26 @@ public class ManageImageJspBean extends PluginAdminPageJspBean
     // PARAMETERS
     private static final String PARAMETER_ID = "id";
     private static final String PARAMETER_ID_GALLERY = "idGallery";
+    private static final String PARAMETER_ID_GALLERY_IMAGE_GALLERY = "id";
     
-    // PROPERIES
+    // PROPERTIES
     private static final String PROPERTY_ERROR_SAFE_IMAGE = "galleryimage.error.file_not_safe";
+    private static final String PROPERTY_ERROR_MISSING_IMAGE = "galleryimage.error.file_missing";
     private static final String PROPERTY_ERROR_UNAUTHORIZED = "galleryimage.rbac.error.unauthorized";
     
+    //CONSTANTS
+    private static final String CROPPING_ACTION_ON = "on";
+    
     // SERVICES
-    private IImageService _imageService = SpringContextService.getBean( IImageService.BEAN_NAME );
+    @Inject
+    private IImageService _imageService;
+    
+    @Inject
+    private FileService _fileService;
+    
+    @Inject
+	@Named( "defaultDatabaseFileStoreProvider" )
+	private IFileStoreServiceProvider _fileStoreService;
 
     /**
      * 
@@ -106,15 +135,16 @@ public class ManageImageJspBean extends PluginAdminPageJspBean
      * 
      * @return
      */
+    @View( VIEW_CREATE_IMAGE )
     public String getCreateImage( HttpServletRequest request )
     {
         if ( !RBACService.isAuthorized( Image.RESOURCE_TYPE, RBAC.WILDCARD_RESOURCES_ID, Image.PERMISSION_CREATE, (User) getUser( ) ) )
         {
-            return AdminMessageService.getMessageUrl( request, PROPERTY_ERROR_UNAUTHORIZED, AdminMessage.TYPE_ERROR );
+            return redirect( request, AdminMessageService.getMessageUrl( request, PROPERTY_ERROR_UNAUTHORIZED, AdminMessage.TYPE_ERROR ) );
         }
         
         Locale locale = getLocale( );
-        Map<String, Object> model = new HashMap<>( );
+        Map<String, Object> model = getModel( );
         
         model.put( MARK_ID_GALLERY, request.getParameter( PARAMETER_ID_GALLERY ) );
         
@@ -129,63 +159,136 @@ public class ManageImageJspBean extends PluginAdminPageJspBean
      * @param request
      * @return
      */
+    @Action( ACTION_CREATE_IMAGE )
     public String doCreateImage( HttpServletRequest request )
     {
         if ( !RBACService.isAuthorized( Image.RESOURCE_TYPE, RBAC.WILDCARD_RESOURCES_ID, Image.PERMISSION_CREATE, (User) getUser( ) ) )
         {
-            return AdminMessageService.getMessageUrl( request, PROPERTY_ERROR_UNAUTHORIZED, AdminMessage.TYPE_ERROR );
+            return redirect( request, AdminMessageService.getMessageUrl( request, PROPERTY_ERROR_UNAUTHORIZED, AdminMessage.TYPE_ERROR ) );
         }
         
-        String strImageWidth = request.getParameter( MARK_IMAGE_WIDTH );
-        String strImageCroppable = request.getParameter( MARK_IMAGE_CROPPABLE );
-
-        MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
-
-        Image image = new Image( );
-        populate( image, request );
-
-        FileItem fileParameterBinaryValue = multipartRequest.getFile( MARK_IMAGE );
-
-        if ( !ImageUtils.safeImage( fileParameterBinaryValue ) )
+        MultipartItem fileItem = ((MultipartHttpServletRequest) request).getFile( MARK_IMAGE );   
+        
+        if( fileItem == null || !( fileItem.getSize( ) > 0 ) )
         {
-            return AdminMessageService.getMessageUrl( request, PROPERTY_ERROR_SAFE_IMAGE, AdminMessage.TYPE_ERROR );
+        	return redirect( request, AdminMessageService.getMessageUrl( request, PROPERTY_ERROR_MISSING_IMAGE, AdminMessage.TYPE_ERROR ) );
         }
-
-        if ( fileParameterBinaryValue != null && fileParameterBinaryValue.getSize( ) > 0 )
+        
+        if ( !ImageUtils.safeImage( fileItem.get( ) ) )
         {
-            if ( "on".equals( strImageCroppable ) && StringUtils.isNumeric( strImageWidth ) )
-            {
-                fileParameterBinaryValue = ImageUtils.resizeImage( fileParameterBinaryValue, Integer.parseInt( strImageWidth ) );
-            }
-
-            FileImagePublicService.init( );
-            image.setIdFile( Integer.parseInt( FileImagePublicService.getInstance( ).addImageResource( fileParameterBinaryValue ) ) );
-            _imageService.create( image );
+            return redirect( request, AdminMessageService.getMessageUrl( request, PROPERTY_ERROR_SAFE_IMAGE, AdminMessage.TYPE_ERROR ) );
         }
+        
+        Image image = createImage( request, fileItem );       
 
         if( image.getIdGallery( ) > 0 )
         {
-            return AppPathService.getBaseUrl( request ) + JSP_MANAGE_IMAGE_OF_GALLERY + image.getIdGallery( );
+            return redirectToListGalleryImageView( request, image.getIdGallery( ) );
         } else
         {
-            return AppPathService.getBaseUrl( request ) + JSP_LIST_IMAGE;
+            return redirectView( request, VIEW_MANAGE_IMAGE );
         }
     }
+    
+    /**
+     * Performs image creation
+     * 
+     * @param request
+     * @param fileItem
+     * @return image object
+     */
+    private Image createImage( HttpServletRequest request, MultipartItem fileItem )
+    {
+    	Image image = new Image( );
+        populate( image, request );
 
+        String strImageWidth = request.getParameter( MARK_IMAGE_WIDTH );
+        String strImageCroppable = request.getParameter( MARK_IMAGE_CROPPABLE );
+        	
+        try( ByteArrayOutputStream imageOutputStream = getImageOutputStream( fileItem.get( ), strImageCroppable, strImageWidth ) )
+        {
+        	File file = getFile( fileItem.getName( ), fileItem.getContentType( ), imageOutputStream.toByteArray( ) );
+        	image.setIdFile( Integer.parseInt( _fileStoreService.storeFile( file ) ) );
+                    
+        	image = _imageService.create( image );                	  
+        }
+        catch( FileServiceException | IOException e )
+        {
+        	AppLogService.error( e );
+        }
+        return image;
+    }
+    
+    /**
+     * Gets an outputStream from image byte array. The image is resized if resizing check box has been checked and if width is valid (numeric value)
+     * 
+     * @param fileImage
+     * @param strImageCroppable
+     * @param strImageWidth
+     * @return ByteArrayOutputStream object
+     */
+    private ByteArrayOutputStream getImageOutputStream( byte[ ] fileImage, String strImageCroppable, String strImageWidth )
+    {
+    	if ( isValidCroppingActionPerformed( strImageCroppable, strImageWidth ) )
+        {
+    		return ImageUtils.getImageOutputStream( fileImage, strImageWidth );
+        }
+
+    	return ImageUtils.getImageOutputStream( fileImage, null );
+    }
+    
+    /**
+     *  returns a file object from image byte array
+     * 
+     * @param fileName
+     * @param mimeType
+     * @param content
+     * @return file
+     */
+    private File getFile( String fileName, String fileMimeType, byte[] fileImageContent )
+    {
+    	File file = new File( );
+        file.setTitle( fileName );
+        file.setMimeType( fileMimeType );
+        file.setSize( fileImageContent.length );
+
+        PhysicalFile physicalFile = new PhysicalFile( );
+        physicalFile.setValue( fileImageContent );
+
+        file.setPhysicalFile( physicalFile );
+        
+        return file;
+    }
+
+    /**
+     * Redirect to list image gallery view
+     * 
+     * @param request
+     * @param idGallery
+     * @return list gallery iage view
+     */
+    private String redirectToListGalleryImageView( HttpServletRequest request, int idGallery )
+    {
+    	Map<String, String> mapParameters = new LinkedHashMap<>( );
+        mapParameters.put( PARAMETER_ID_GALLERY_IMAGE_GALLERY, String.valueOf( idGallery ) );
+    	return redirect( request, ManageGalleryJspBean.VIEW_LIST_GALLERY_IMAGE, mapParameters );
+    }
+    
     /**
      * getListImage
      * 
      * @return
      */
+    @View( value = VIEW_MANAGE_IMAGE, defaultView = true )
     public String getListImage( HttpServletRequest request )
     {
         if ( !RBACService.isAuthorized( Image.RESOURCE_TYPE, RBAC.WILDCARD_RESOURCES_ID, Image.PERMISSION_VIEW, (User) getUser( ) ) )
         {
-            return AdminMessageService.getMessageUrl( request, PROPERTY_ERROR_UNAUTHORIZED, AdminMessage.TYPE_ERROR );
+            return redirect( request, AdminMessageService.getMessageUrl( request, PROPERTY_ERROR_UNAUTHORIZED, AdminMessage.TYPE_ERROR ) );
         }
         
         Locale locale = getLocale( );
-        Map<String, Object> model = new HashMap<>( );
+        Map<String, Object> model = getModel( );
 
         List<Image> listImage = _imageService.getImagesList( );
 
@@ -202,17 +305,18 @@ public class ManageImageJspBean extends PluginAdminPageJspBean
      * @param request
      * @return
      */
+    @View( VIEW_MODIFY_IMAGE )
     public String getModifyImage( HttpServletRequest request )
     {
         if ( !RBACService.isAuthorized( Image.RESOURCE_TYPE, RBAC.WILDCARD_RESOURCES_ID, Image.PERMISSION_MODIFY, (User) getUser( ) ) )
         {
-            return AdminMessageService.getMessageUrl( request, PROPERTY_ERROR_UNAUTHORIZED, AdminMessage.TYPE_ERROR );
+            return redirect( request, AdminMessageService.getMessageUrl( request, PROPERTY_ERROR_UNAUTHORIZED, AdminMessage.TYPE_ERROR ) );
         }
         
         String strIdImage = request.getParameter( PARAMETER_ID );
 
         Locale locale = getLocale( );
-        Map<String, Object> model = new HashMap<>( );
+        Map<String, Object> model = getModel( );
 
         if ( StringUtils.isNumeric( strIdImage ) )
         {
@@ -232,71 +336,140 @@ public class ManageImageJspBean extends PluginAdminPageJspBean
      * @param request
      * @return
      */
+    @Action( ACTION_MODIFY_IMAGE )
     public String doModifyImage( HttpServletRequest request )
     {
         if ( !RBACService.isAuthorized( Image.RESOURCE_TYPE, RBAC.WILDCARD_RESOURCES_ID, Image.PERMISSION_MODIFY, (User) getUser( ) ) )
         {
-            return AdminMessageService.getMessageUrl( request, PROPERTY_ERROR_UNAUTHORIZED, AdminMessage.TYPE_ERROR );
+            return redirect( request, AdminMessageService.getMessageUrl( request, PROPERTY_ERROR_UNAUTHORIZED, AdminMessage.TYPE_ERROR ) );
         }
         
         String strIdImage = request.getParameter( PARAMETER_ID );
-        String strImageWidth = request.getParameter( MARK_IMAGE_WIDTH );
-        String strImageCroppable = request.getParameter( MARK_IMAGE_CROPPABLE );
 
-        MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
-        FileItem fileParameterBinaryValue = multipartRequest.getFile( MARK_IMAGE );
-
-        if ( !ImageUtils.safeImage( fileParameterBinaryValue ) )
+        MultipartItem fileItem = ((MultipartHttpServletRequest) request).getFile( MARK_IMAGE );
+        
+        if ( fileItem != null && fileItem.getSize( ) > 0 && !ImageUtils.safeImage( fileItem.get( ) ) )
         {
             return AdminMessageService.getMessageUrl( request, PROPERTY_ERROR_SAFE_IMAGE, AdminMessage.TYPE_ERROR );
         }
-
+        
         if ( StringUtils.isNumeric( strIdImage ) )
         {
-            Image image = _imageService.findByPrimaryKey( Integer.parseInt( strIdImage ) );
-            populate( image, request );
-
-            if ( fileParameterBinaryValue != null && fileParameterBinaryValue.getSize( ) > 0 )
-            {
-                if ( "on".equals( strImageCroppable ) && StringUtils.isNumeric( strImageWidth ) )
-                {
-                    fileParameterBinaryValue = ImageUtils.resizeImage( fileParameterBinaryValue, Integer.parseInt( strImageWidth ) );
-                }
-
-                FileImagePublicService.init( );
-                try
-                {
-                	FileService.getInstance( ).getFileStoreServiceProvider( ).delete( String.valueOf( image.getIdFile( ) ) );
-                }
-                catch( FileServiceException e )
-                {
-                	AppLogService.error( e );
-                }
-
-                image.setIdFile( Integer.parseInt( FileImagePublicService.getInstance( ).addImageResource( fileParameterBinaryValue ) ) );
-            }
-            _imageService.update( image );
+        	Image image = updateImage( request, fileItem, strIdImage );
             
             if( image.getIdGallery( ) > 0 )
             {
-                return AppPathService.getBaseUrl( request ) + JSP_MANAGE_IMAGE_OF_GALLERY + image.getIdGallery( );
+            	return redirectToListGalleryImageView( request, image.getIdGallery( ) );
             }
         }
-
-        return AppPathService.getBaseUrl( request ) + JSP_LIST_IMAGE;
+        
+        return redirectView( request, VIEW_MANAGE_IMAGE );
     }
+    
+    /**
+     * Performs image update
+     * 
+     * @param request
+     * @param fileItem
+     * @param strIdImage
+     * @return image object
+     */
+    private Image updateImage( HttpServletRequest request, MultipartItem fileItem, String strIdImage )
+    {	
+        Image image = _imageService.findByPrimaryKey( Integer.parseInt( strIdImage ) );
+        populate( image, request );
 
+        String strImageWidth = request.getParameter( MARK_IMAGE_WIDTH );
+        String strImageCroppable = request.getParameter( MARK_IMAGE_CROPPABLE );
+       
+        String fileName = null;
+        String fileMimeType = null;
+        byte[ ] fileImageContent = null;
+        
+        if ( isNewImageLoaded( fileItem ) )
+        {       	
+        	fileName = fileItem.getName( );
+        	fileMimeType = fileItem.getContentType( );
+        	fileImageContent = fileItem.get( );
+        }
+        else
+        {
+        	if( isValidCroppingActionPerformed( strImageCroppable, strImageWidth ) )
+            {
+        		try
+        		{
+        			File currentFile = _fileService.getFileStoreServiceProvider( ).getFile( String.valueOf( image.getIdFile( ) ) );
+        			if( currentFile != null && currentFile.getPhysicalFile( ) != null )
+            		{        				
+            			fileName = currentFile.getTitle( );
+            			fileMimeType = currentFile.getMimeType( );
+            			fileImageContent = currentFile.getPhysicalFile( ).getValue( );
+            		}
+        		}
+        		catch( FileServiceException e )
+                {
+                	AppLogService.error( e );
+                }        		
+            }
+        	else
+        	{
+        		//No action (actually, cropping) is performed on the current image so there is no need to update the content of the image file
+        	}
+        }
+        
+        if( fileImageContent != null )
+        {
+        	try( ByteArrayOutputStream imageOutputStream = getImageOutputStream( fileImageContent, strImageCroppable, strImageWidth ) )
+        	{
+        		_fileService.getFileStoreServiceProvider( ).delete( String.valueOf( image.getIdFile( ) ) );
+            	
+                File file = getFile( fileName, fileMimeType, imageOutputStream.toByteArray( ) );                       
+                image.setIdFile( Integer.parseInt( _fileStoreService.storeFile( file ) ) );
+        	}
+        	catch( FileServiceException | IOException e )
+            {
+            	AppLogService.error( e );
+            }
+        }
+            
+        return _imageService.update( image );
+    }
+    
+    /**
+     * Checks if a new image has been uploaded to replace current one
+     * 
+     * @param fileItem
+     * @return true if a new image has been uploaded in the form, false otherwise
+     */
+    private boolean isNewImageLoaded( MultipartItem fileItem )
+    {
+    	return fileItem != null && fileItem.getSize( ) > 0;
+    }
+    
+    /**
+     * Checks if the image (current or new) must be cropped. Cropping/resizing is considered valid if entered width is numeric
+     * 
+     * @param strImageCroppable
+     * @param strImageWidth
+     * @return true if a cropping action has been asked with a valid width, false otherwise
+     */
+    private boolean isValidCroppingActionPerformed( String strImageCroppable, String strImageWidth )
+    {
+    	return CROPPING_ACTION_ON.equals( strImageCroppable ) && StringUtils.isNumeric( strImageWidth );
+    }
+    
     /**
      * doDeleteImage
      * 
      * @param request
      * @return
      */
+    @Action( value = ACTION_DELETE_IMAGE, securityTokenDisabled = true )
     public String doDeleteImage( HttpServletRequest request )
     {
         if ( !RBACService.isAuthorized( Image.RESOURCE_TYPE, RBAC.WILDCARD_RESOURCES_ID, Image.PERMISSION_DELETE, (User) getUser( ) ) )
         {
-            return AdminMessageService.getMessageUrl( request, PROPERTY_ERROR_UNAUTHORIZED, AdminMessage.TYPE_ERROR );
+            return redirect( request, AdminMessageService.getMessageUrl( request, PROPERTY_ERROR_UNAUTHORIZED, AdminMessage.TYPE_ERROR ) );
         }
         
         String strIdImage = request.getParameter( PARAMETER_ID );
@@ -307,7 +480,7 @@ public class ManageImageJspBean extends PluginAdminPageJspBean
 
             try
             {
-            	FileService.getInstance( ).getFileStoreServiceProvider( ).delete( String.valueOf( image.getIdFile( ) ) );
+            	_fileService.getFileStoreServiceProvider( ).delete( String.valueOf( image.getIdFile( ) ) );
             }
             catch( FileServiceException e )
             {
@@ -319,11 +492,11 @@ public class ManageImageJspBean extends PluginAdminPageJspBean
             
             if( image.getIdGallery( ) > 0 )
             {
-                return AppPathService.getBaseUrl( request ) + JSP_MANAGE_IMAGE_OF_GALLERY + image.getIdGallery( );
+            	return redirectToListGalleryImageView( request, image.getIdGallery( ) );
             }
         }
 
-        return AppPathService.getBaseUrl( request ) + JSP_LIST_IMAGE;
+        return redirectView( request, VIEW_MANAGE_IMAGE );
     }
 
 }

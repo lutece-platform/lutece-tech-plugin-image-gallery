@@ -1,4 +1,4 @@
-${ pageContext.setAttribute( 'strContent', manageGalleryJspBean.processController( pageContext.request , pageContext.response ) ) }
+${ pageContext.setAttribute( 'strContent', manageImageJspBean.processController( pageContext.request , pageContext.response ) ) }
 
 <%@ page errorPage="../../ErrorPage.jsp" %>
 <jsp:include page="../../AdminHeader.jsp" />
