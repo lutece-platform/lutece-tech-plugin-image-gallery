@@ -31,7 +31,7 @@
 							<@td>
 								<@aButton href='jsp/admin/plugins/galleryimage/ManageGallery.jsp?view=modifyGalleryImage&id=${(config.idGallery)!}' buttonIcon='edit' size='sm' title='#i18n{galleryimage.manage_gallery_image.button_modify}' hideTitle=['all'] />
 								<@aButton href='jsp/admin/plugins/galleryimage/ManageGallery.jsp?view=listImagesGallery&id=${(config.idGallery)!}' buttonIcon='image' size='sm' title='#i18n{galleryimage.manage_gallery_image.button_choose_image}' hideTitle=['all'] />
-								<@aButton href='jsp/admin/plugins/galleryimage/ManageGallery.jsp?action=deleteGalleryImage&id=${(config.idGallery)!}' buttonIcon='trash' size='sm' title='#i18n{galleryimage.manage_gallery_image.button_delete}' hideTitle=['all'] color='danger' />
+								<@aButton href='jsp/admin/plugins/galleryimage/ManageGallery.jsp?action=deleteGalleryImage&id=${(config.idGallery)!}&_csrftoken=${(delete_gallery_token)!}' buttonIcon='trash' size='sm' title='#i18n{galleryimage.manage_gallery_image.button_delete}' hideTitle=['all'] color='danger' />
 							</@td>
 						</@tr>
 						</#list>

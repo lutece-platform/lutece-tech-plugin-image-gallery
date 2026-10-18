@@ -44,7 +44,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import fr.paris.lutece.api.user.User;
 import fr.paris.lutece.plugins.galleryimage.business.Gallery;
@@ -57,6 +57,7 @@ import fr.paris.lutece.plugins.galleryimage.util.EnumGalleryImageType;
 import fr.paris.lutece.portal.business.rbac.RBAC;
 import fr.paris.lutece.portal.service.admin.AccessDeniedException;
 import fr.paris.lutece.portal.service.rbac.RBACService;
+import fr.paris.lutece.portal.service.security.SecurityTokenService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.portal.service.util.AppPathService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
@@ -68,6 +69,7 @@ import fr.paris.lutece.portal.web.util.LocalizedPaginator;
 import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.html.AbstractPaginator;
 import fr.paris.lutece.util.html.HtmlTemplate;
+import jakarta.inject.Inject;
 
 @RequestScoped
 @Named
@@ -110,6 +112,10 @@ public class ManageGalleryJspBean extends MVCAdminJspBean
     private static final String MARK_PAGINATOR_IMAGE_SELECTED       = "paginatorImageSelected";
     private static final String MARK_PAGINATOR_IMAGE_OF_GALLERY     = "paginatorImageOfGallery";
     private static final String MARK_NB_ITEMS_PER_PAGE              = "nb_items_per_page";
+    private static final String MARK_DELETE_GALLERY_TOKEN           = "delete_gallery_token";
+    private static final String MARK_ADD_IMAGE_TOKEN                = "add_image_token";
+    private static final String MARK_REMOVE_IMAGE_TOKEN             = "remove_image_token";
+    private static final String MARK_DELETE_IMAGE_TOKEN             = "delete_image_token";
 
     // PARAMETER
     private static final String PARAMETER_ID                        = "id";
@@ -121,11 +127,16 @@ public class ManageGalleryJspBean extends MVCAdminJspBean
     private static final String CURRENT_PAGE_INDEX_GALLERY_IMAGE    = "current_page_index_gallery_image";
     private static final String CURRENT_PAGE_INDEX_IMAGE_OF_GALLERY = "current_page_index_image_of_gallery";
     private static final String UNAUTHORIZED                        = "Unauthorized";
+    // Action of ManageImageJspBean called by the links of the images of a gallery
+    private static final String ACTION_DELETE_IMAGE                 = "deleteImage";
 
     /**
      * 
      */
     private static final long   serialVersionUID                    = -3336177193606492480L;
+
+    @Inject
+    private SecurityTokenService _securityTokenService;
 
     @View( value = VIEW_MANAGE_GALLERY_IMAGE, defaultView = true )
     public String getManageGalleryImage( HttpServletRequest request )
@@ -134,6 +145,8 @@ public class ManageGalleryJspBean extends MVCAdminJspBean
         Map<String, Object> model = getModel( );
 
         model.put( MARK_LIST_GALLERY_IMAGE_CONFIG, GalleryHome.findAll( ) );
+        // The core checks the token of an action called by a link too, as the parameter _csrftoken
+        model.put( MARK_DELETE_GALLERY_TOKEN, _securityTokenService.getToken( request, ACTION_DELETE_GALLERY_IMAGE ) );
 
         HtmlTemplate html = AppTemplateService.getTemplate( TEMPLATE_MANAGE_GALLERY_IMAGE, locale, model );
 
@@ -164,19 +177,19 @@ public class ManageGalleryJspBean extends MVCAdminJspBean
         Locale locale = getLocale( );
         Map<String, Object> model = getModel( );
 
-        String strIdGalleryImageConfig = request.getParameter( PARAMETER_ID );
+        Gallery gallery = findGallery( request );
 
-        if ( StringUtils.isNumeric( strIdGalleryImageConfig ) )
+        if ( gallery == null )
         {
-            Gallery gallery = GalleryHome.find( Integer.parseInt( strIdGalleryImageConfig ) );
-
-            if ( !RBACService.isAuthorized( Gallery.RESOURCE_TYPE, gallery.getCodeGallery( ), Gallery.PERMISSION_MODIFY, ( User ) getUser( ) ) )
-            {
-                throw new AccessDeniedException( UNAUTHORIZED );
-            }
-
-            model.put( MARK_GALLERY_IMAGE_CONFIG, gallery );
+            return redirectView( request, VIEW_MANAGE_GALLERY_IMAGE );
         }
+
+        if ( !RBACService.isAuthorized( Gallery.RESOURCE_TYPE, gallery.getCodeGallery( ), Gallery.PERMISSION_MODIFY, ( User ) getUser( ) ) )
+        {
+            throw new AccessDeniedException( UNAUTHORIZED );
+        }
+
+        model.put( MARK_GALLERY_IMAGE_CONFIG, gallery );
 
         model.put( MARK_LIST_GALLERY_TYPE, EnumGalleryImageType.getReferenceList( ) );
 
@@ -210,28 +223,32 @@ public class ManageGalleryJspBean extends MVCAdminJspBean
         Gallery config = new Gallery( );
         populate( config, request );
 
-        if ( !RBACService.isAuthorized( Gallery.RESOURCE_TYPE, config.getCodeGallery( ), Gallery.PERMISSION_MODIFY, ( User ) getUser( ) ) )
+        // The permission is checked on the stored gallery, not on the code posted with the form, and the code is kept
+        Gallery gallery = GalleryHome.find( config.getIdGallery( ) );
+
+        if ( gallery == null )
+        {
+            return getManageGalleryImage( request );
+        }
+
+        if ( !RBACService.isAuthorized( Gallery.RESOURCE_TYPE, gallery.getCodeGallery( ), Gallery.PERMISSION_MODIFY, ( User ) getUser( ) ) )
         {
             throw new AccessDeniedException( UNAUTHORIZED );
         }
 
-        if ( config.getIdGallery( ) > 0 )
-        {
-            GalleryHome.update( config );
-        }
+        config.setCodeGallery( gallery.getCodeGallery( ) );
+        GalleryHome.update( config );
 
         return getManageGalleryImage( request );
     }
 
-    @Action( value = ACTION_DELETE_GALLERY_IMAGE, securityTokenDisabled = true )
+    @Action( ACTION_DELETE_GALLERY_IMAGE )
     public String doDeleteGalleryImage( HttpServletRequest request ) throws AccessDeniedException
     {
-        String strIdGalleryImageConfig = request.getParameter( PARAMETER_ID );
+        Gallery gallery = findGallery( request );
 
-        if ( StringUtils.isNumeric( strIdGalleryImageConfig ) )
+        if ( gallery != null )
         {
-            Gallery gallery = GalleryHome.find( Integer.parseInt( strIdGalleryImageConfig ) );
-
             if ( !RBACService.isAuthorized( Gallery.RESOURCE_TYPE, gallery.getCodeGallery( ), Gallery.PERMISSION_DELETE, ( User ) getUser( ) ) )
             {
                 throw new AccessDeniedException( UNAUTHORIZED );
@@ -254,13 +271,13 @@ public class ManageGalleryJspBean extends MVCAdminJspBean
     @View( VIEW_LIST_GALLERY_IMAGE )
     public String getListImagesGallery( HttpServletRequest request ) throws AccessDeniedException
     {
-        String strIdGallery = request.getParameter( PARAMETER_ID );
+        Gallery config = findGallery( request );
 
-        if ( StringUtils.isNumeric( strIdGallery ) )
+        if ( config != null )
         {
+            String strIdGallery = String.valueOf( config.getIdGallery( ) );
             Locale locale = getLocale( );
             Map<String, Object> model = getModel( );
-            Gallery config = GalleryHome.find( Integer.parseInt( strIdGallery ) );
 
             if ( !RBACService.isAuthorized( Gallery.RESOURCE_TYPE, config.getCodeGallery( ), Gallery.PERMISSION_MANAGE_GALLERY_IMAGE, ( User ) getUser( ) ) )
             {
@@ -283,6 +300,9 @@ public class ManageGalleryJspBean extends MVCAdminJspBean
             model.put( MARK_PAGINATOR_IMAGE_SELECTED, paginatorImageSelected );
             model.put( MARK_PAGINATOR_IMAGE_OF_GALLERY, paginatorImageAvailableOnlyGallery );
             model.put( MARK_NB_ITEMS_PER_PAGE, AppPropertiesService.getPropertyInt( PROPERTY_NUMBER_OF_DEMAND_PER_PAGE, 10 ) );
+            model.put( MARK_ADD_IMAGE_TOKEN, _securityTokenService.getToken( request, ACTION_ADD_IMAGE_TO_GALLERY ) );
+            model.put( MARK_REMOVE_IMAGE_TOKEN, _securityTokenService.getToken( request, ACTION_DELETE_IMAGE_TO_GALLERY ) );
+            model.put( MARK_DELETE_IMAGE_TOKEN, _securityTokenService.getToken( request, ACTION_DELETE_IMAGE ) );
 
             HtmlTemplate html = AppTemplateService.getTemplate( TEMPLATE_MANAGE_IMAGE, locale, model );
 
@@ -302,19 +322,17 @@ public class ManageGalleryJspBean extends MVCAdminJspBean
     @Action( ACTION_ADD_IMAGE_TO_GALLERY )
     public String doAddImageToGallery( HttpServletRequest request ) throws AccessDeniedException
     {
-        String strIdGallery = request.getParameter( PARAMETER_ID );
-        String strIdImage = request.getParameter( PARAMETER_ID_IMAGE );
+        Gallery config = findGallery( request );
+        int nIdImage = NumberUtils.toInt( request.getParameter( PARAMETER_ID_IMAGE ), -1 );
 
-        if ( StringUtils.isNumeric( strIdGallery ) && StringUtils.isNumeric( strIdImage ) )
+        if ( config != null && nIdImage > 0 )
         {
-            Gallery config = GalleryHome.find( Integer.parseInt( strIdGallery ) );
-
             if ( !RBACService.isAuthorized( Gallery.RESOURCE_TYPE, config.getCodeGallery( ), Gallery.PERMISSION_MANAGE_GALLERY_IMAGE, ( User ) getUser( ) ) )
             {
                 throw new AccessDeniedException( ManageGalleryJspBean.UNAUTHORIZED );
             }
 
-            Image image = ImageHome.find( Integer.parseInt( strIdImage ) );
+            Image image = ImageHome.find( nIdImage );
 
             if ( image != null )
             {
@@ -341,22 +359,17 @@ public class ManageGalleryJspBean extends MVCAdminJspBean
     @Action( ACTION_DELETE_IMAGE_TO_GALLERY )
     public String doDeleteImageToGallery( HttpServletRequest request ) throws AccessDeniedException
     {
-        String strIdGallery = request.getParameter( PARAMETER_ID );
-        String strIdImage = request.getParameter( PARAMETER_ID_IMAGE );
+        Gallery gallery = findGallery( request );
+        int nIdImage = NumberUtils.toInt( request.getParameter( PARAMETER_ID_IMAGE ), -1 );
 
-        if ( StringUtils.isNumeric( strIdGallery ) && StringUtils.isNumeric( strIdImage ) )
+        if ( gallery != null && nIdImage > 0 )
         {
-            int nIdGallery = Integer.parseInt( strIdGallery );
-            int nIdImage = Integer.parseInt( strIdImage );
-
-            Gallery gallery = GalleryHome.find( Integer.parseInt( strIdGallery ) );
-
             if ( !RBACService.isAuthorized( Gallery.RESOURCE_TYPE, gallery.getCodeGallery( ), Gallery.PERMISSION_MANAGE_GALLERY_IMAGE, ( User ) getUser( ) ) )
             {
                 throw new AccessDeniedException( ManageGalleryJspBean.UNAUTHORIZED );
             }
 
-            GalleryImageHome.removeByGalleryIdAndIdImage( nIdGallery, nIdImage );
+            GalleryImageHome.removeByGalleryIdAndIdImage( gallery.getIdGallery( ), nIdImage );
             return getListImagesGallery( request );
         }
 
@@ -378,6 +391,20 @@ public class ManageGalleryJspBean extends MVCAdminJspBean
         HtmlTemplate html = AppTemplateService.getTemplate( TEMPLATE_SELECT_LIST_GALLERY, getLocale( ), model );
 
         return html.getHtml( );
+    }
+
+    /**
+     * Find the gallery of the id parameter
+     * 
+     * @param request
+     *            the request
+     * @return the gallery, or null when the id is missing, not a number or unknown
+     */
+    private static Gallery findGallery( HttpServletRequest request )
+    {
+        int nIdGallery = NumberUtils.toInt( request.getParameter( PARAMETER_ID ), -1 );
+
+        return ( nIdGallery > 0 ) ? GalleryHome.find( nIdGallery ) : null;
     }
 
     /**

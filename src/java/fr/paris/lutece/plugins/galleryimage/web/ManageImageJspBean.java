@@ -41,6 +41,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import fr.paris.lutece.api.user.User;
 import fr.paris.lutece.plugins.galleryimage.business.GalleryImageHome;
@@ -56,6 +57,7 @@ import fr.paris.lutece.portal.service.file.IFileStoreServiceProvider;
 import fr.paris.lutece.portal.service.message.AdminMessage;
 import fr.paris.lutece.portal.service.message.AdminMessageService;
 import fr.paris.lutece.portal.service.rbac.RBACService;
+import fr.paris.lutece.portal.service.security.SecurityTokenService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.portal.service.upload.MultipartItem;
 import fr.paris.lutece.portal.service.util.AppLogService;
@@ -99,6 +101,7 @@ public class ManageImageJspBean extends MVCAdminJspBean
     private static final String MARK_IMAGE_WIDTH = "image_width";
     private static final String MARK_IMAGE_CROPPABLE = "image_croppable";
     private static final String MARK_ID_GALLERY = "idGallery";
+    private static final String MARK_DELETE_IMAGE_TOKEN = "delete_image_token";
 
     // PARAMETERS
     private static final String PARAMETER_ID = "id";
@@ -123,6 +126,9 @@ public class ManageImageJspBean extends MVCAdminJspBean
     @Inject
 	@Named( "defaultDatabaseFileStoreProvider" )
 	private IFileStoreServiceProvider _fileStoreService;
+
+    @Inject
+    private SecurityTokenService _securityTokenService;
 
     /**
      * 
@@ -293,6 +299,8 @@ public class ManageImageJspBean extends MVCAdminJspBean
         List<Image> listImage = _imageService.getImagesList( );
 
         model.put( MARK_LIST_IMAGE, listImage );
+        // The core checks the token of an action called by a link too, as the parameter _csrftoken
+        model.put( MARK_DELETE_IMAGE_TOKEN, _securityTokenService.getToken( request, ACTION_DELETE_IMAGE ) );
 
         HtmlTemplate html = AppTemplateService.getTemplate( TEMPLATE_LIST_IMAGE, locale, model );
 
@@ -313,17 +321,18 @@ public class ManageImageJspBean extends MVCAdminJspBean
             return redirect( request, AdminMessageService.getMessageUrl( request, PROPERTY_ERROR_UNAUTHORIZED, AdminMessage.TYPE_ERROR ) );
         }
         
-        String strIdImage = request.getParameter( PARAMETER_ID );
+        int nIdImage = getIdImageParameter( request );
+        Image image = ( nIdImage > 0 ) ? _imageService.findImageWithBinary( nIdImage ) : null;
+
+        if ( image == null )
+        {
+            return redirectView( request, VIEW_MANAGE_IMAGE );
+        }
 
         Locale locale = getLocale( );
         Map<String, Object> model = getModel( );
 
-        if ( StringUtils.isNumeric( strIdImage ) )
-        {
-            Image image = _imageService.findImageWithBinary( Integer.parseInt( strIdImage ) );
-
-            model.put( MARK_IMAGE, image );
-        }
+        model.put( MARK_IMAGE, image );
 
         HtmlTemplate html = AppTemplateService.getTemplate( TEMPLATE_MODIFY_IMAGE, locale, model );
 
@@ -344,7 +353,13 @@ public class ManageImageJspBean extends MVCAdminJspBean
             return redirect( request, AdminMessageService.getMessageUrl( request, PROPERTY_ERROR_UNAUTHORIZED, AdminMessage.TYPE_ERROR ) );
         }
         
-        String strIdImage = request.getParameter( PARAMETER_ID );
+        int nIdImage = getIdImageParameter( request );
+        Image storedImage = ( nIdImage > 0 ) ? _imageService.findByPrimaryKey( nIdImage ) : null;
+
+        if ( storedImage == null )
+        {
+            return redirectView( request, VIEW_MANAGE_IMAGE );
+        }
 
         MultipartItem fileItem = ((MultipartHttpServletRequest) request).getFile( MARK_IMAGE );
         
@@ -353,14 +368,11 @@ public class ManageImageJspBean extends MVCAdminJspBean
             return AdminMessageService.getMessageUrl( request, PROPERTY_ERROR_SAFE_IMAGE, AdminMessage.TYPE_ERROR );
         }
         
-        if ( StringUtils.isNumeric( strIdImage ) )
+        Image image = updateImage( request, fileItem, storedImage );
+
+        if( image.getIdGallery( ) > 0 )
         {
-        	Image image = updateImage( request, fileItem, strIdImage );
-            
-            if( image.getIdGallery( ) > 0 )
-            {
-            	return redirectToListGalleryImageView( request, image.getIdGallery( ) );
-            }
+            return redirectToListGalleryImageView( request, image.getIdGallery( ) );
         }
         
         return redirectView( request, VIEW_MANAGE_IMAGE );
@@ -371,12 +383,12 @@ public class ManageImageJspBean extends MVCAdminJspBean
      * 
      * @param request
      * @param fileItem
-     * @param strIdImage
+     * @param image
+     *            the stored image
      * @return image object
      */
-    private Image updateImage( HttpServletRequest request, MultipartItem fileItem, String strIdImage )
+    private Image updateImage( HttpServletRequest request, MultipartItem fileItem, Image image )
     {	
-        Image image = _imageService.findByPrimaryKey( Integer.parseInt( strIdImage ) );
         populate( image, request );
 
         String strImageWidth = request.getParameter( MARK_IMAGE_WIDTH );
@@ -464,7 +476,7 @@ public class ManageImageJspBean extends MVCAdminJspBean
      * @param request
      * @return
      */
-    @Action( value = ACTION_DELETE_IMAGE, securityTokenDisabled = true )
+    @Action( ACTION_DELETE_IMAGE )
     public String doDeleteImage( HttpServletRequest request )
     {
         if ( !RBACService.isAuthorized( Image.RESOURCE_TYPE, RBAC.WILDCARD_RESOURCES_ID, Image.PERMISSION_DELETE, (User) getUser( ) ) )
@@ -472,12 +484,11 @@ public class ManageImageJspBean extends MVCAdminJspBean
             return redirect( request, AdminMessageService.getMessageUrl( request, PROPERTY_ERROR_UNAUTHORIZED, AdminMessage.TYPE_ERROR ) );
         }
         
-        String strIdImage = request.getParameter( PARAMETER_ID );
+        int nIdImage = getIdImageParameter( request );
+        Image image = ( nIdImage > 0 ) ? _imageService.findByPrimaryKey( nIdImage ) : null;
 
-        if ( StringUtils.isNumeric( strIdImage ) )
+        if ( image != null )
         {
-            Image image = _imageService.findByPrimaryKey( Integer.parseInt( strIdImage ) );
-
             try
             {
             	_fileService.getFileStoreServiceProvider( ).delete( String.valueOf( image.getIdFile( ) ) );
@@ -499,4 +510,15 @@ public class ManageImageJspBean extends MVCAdminJspBean
         return redirectView( request, VIEW_MANAGE_IMAGE );
     }
 
+    /**
+     * Get the id of the image of the request
+     * 
+     * @param request
+     *            the request
+     * @return the id, or -1 when it is missing or not a number
+     */
+    private static int getIdImageParameter( HttpServletRequest request )
+    {
+        return NumberUtils.toInt( request.getParameter( PARAMETER_ID ), -1 );
+    }
 }
