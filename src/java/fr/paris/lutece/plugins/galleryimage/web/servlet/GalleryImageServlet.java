@@ -45,6 +45,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 
 import fr.paris.lutece.api.user.User;
 import fr.paris.lutece.plugins.galleryimage.business.Gallery;
@@ -103,7 +104,8 @@ public class GalleryImageServlet extends HttpServlet
     {
         String strCodeGallery = request.getParameter( PARAMTER_CODE_GALLERY );        
         String strIndex = request.getParameter( MARK_INDEX );
-        int nIndex = StringUtils.isEmpty( strIndex ) ? 1 : Integer.parseInt( strIndex );
+        // A missing, non numeric or non positive index shows the first page
+        int nIndex = Math.max( NumberUtils.toInt( strIndex, 1 ), 1 );
         int nDefaultItemsPerPage = AppPropertiesService.getPropertyInt( PROPERTY_NB_ITEMS, 5 );
 
         Map<String, Object> model = new HashMap<>( );
@@ -111,6 +113,13 @@ public class GalleryImageServlet extends HttpServlet
         if ( StringUtils.isNotEmpty( strCodeGallery ) )
         {
             Gallery gallery = GalleryHome.findByCodeGallery( strCodeGallery );
+
+            if ( gallery == null )
+            {
+                response.sendError( HttpServletResponse.SC_NOT_FOUND );
+                return;
+            }
+
             PrintWriter out = response.getWriter( );
             
             if( gallery.isAuthenticatedMode( )&&
