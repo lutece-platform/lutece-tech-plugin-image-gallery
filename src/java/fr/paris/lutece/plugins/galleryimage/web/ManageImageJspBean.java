@@ -35,7 +35,6 @@ package fr.paris.lutece.plugins.galleryimage.web;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -62,11 +61,13 @@ import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.portal.service.upload.MultipartItem;
 import fr.paris.lutece.portal.service.util.AppLogService;
 import fr.paris.lutece.portal.util.mvc.admin.MVCAdminJspBean;
+import fr.paris.lutece.portal.util.mvc.utils.MVCUtils;
 import fr.paris.lutece.portal.util.mvc.admin.annotations.Controller;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.Action;
 import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
 import fr.paris.lutece.portal.web.upload.MultipartHttpServletRequest;
 import fr.paris.lutece.util.html.HtmlTemplate;
+import fr.paris.lutece.util.url.UrlItem;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -115,6 +116,7 @@ public class ManageImageJspBean extends MVCAdminJspBean
     
     //CONSTANTS
     private static final String CROPPING_ACTION_ON = "on";
+    private static final String JSP_MANAGE_GALLERY = "ManageGallery.jsp";
     
     // SERVICES
     @Inject
@@ -173,7 +175,7 @@ public class ManageImageJspBean extends MVCAdminJspBean
             return redirect( request, AdminMessageService.getMessageUrl( request, PROPERTY_ERROR_UNAUTHORIZED, AdminMessage.TYPE_ERROR ) );
         }
         
-        MultipartItem fileItem = ((MultipartHttpServletRequest) request).getFile( MARK_IMAGE );   
+        MultipartItem fileItem = getImageFile( request );   
         
         if( fileItem == null || !( fileItem.getSize( ) > 0 ) )
         {
@@ -275,9 +277,11 @@ public class ManageImageJspBean extends MVCAdminJspBean
      */
     private String redirectToListGalleryImageView( HttpServletRequest request, int idGallery )
     {
-    	Map<String, String> mapParameters = new LinkedHashMap<>( );
-        mapParameters.put( PARAMETER_ID_GALLERY_IMAGE_GALLERY, String.valueOf( idGallery ) );
-    	return redirect( request, ManageGalleryJspBean.VIEW_LIST_GALLERY_IMAGE, mapParameters );
+        // The view of the images of a gallery belongs to the gallery controller (ManageGallery.jsp), not to this one
+        UrlItem url = new UrlItem( JSP_MANAGE_GALLERY );
+        url.addParameter( MVCUtils.PARAMETER_VIEW, ManageGalleryJspBean.VIEW_LIST_GALLERY_IMAGE );
+        url.addParameter( PARAMETER_ID_GALLERY_IMAGE_GALLERY, idGallery );
+        return redirect( request, url.getUrl( ) );
     }
     
     /**
@@ -361,7 +365,7 @@ public class ManageImageJspBean extends MVCAdminJspBean
             return redirectView( request, VIEW_MANAGE_IMAGE );
         }
 
-        MultipartItem fileItem = ((MultipartHttpServletRequest) request).getFile( MARK_IMAGE );
+        MultipartItem fileItem = getImageFile( request );
         
         if ( fileItem != null && fileItem.getSize( ) > 0 && !ImageUtils.safeImage( fileItem.get( ) ) )
         {
@@ -520,5 +524,16 @@ public class ManageImageJspBean extends MVCAdminJspBean
     private static int getIdImageParameter( HttpServletRequest request )
     {
         return NumberUtils.toInt( request.getParameter( PARAMETER_ID ), -1 );
+    }
+    /**
+     * Get the image file posted with the form
+     * 
+     * @param request
+     *            the request
+     * @return the file, or null when the request is not a multipart request (action called by a link or a plain form)
+     */
+    private static MultipartItem getImageFile( HttpServletRequest request )
+    {
+        return ( request instanceof MultipartHttpServletRequest multipartRequest ) ? multipartRequest.getFile( MARK_IMAGE ) : null;
     }
 }

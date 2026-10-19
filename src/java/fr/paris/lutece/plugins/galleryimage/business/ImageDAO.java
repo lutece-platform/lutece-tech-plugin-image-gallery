@@ -197,6 +197,13 @@ public final class ImageDAO implements IImageDAO
     public List<Image> selectImagesByIds( List<Integer> listIds, Plugin plugin )
     {
         List<Image> listImages = new ArrayList< >( );
+
+        // No query for an empty list: "IN ( )" is invalid and closing the statement never executed fails (gallery without image)
+        if ( listIds == null || listIds.isEmpty( ) )
+        {
+            return listImages;
+        }
+
         String query = SQL_QUERY_SELECT_BY_IDS + listIds.stream( ).map( i -> "?" ).collect( Collectors.joining( "," ) ) + " )";
 
         try ( DAOUtil daoUtil = new DAOUtil( query, plugin ) )
