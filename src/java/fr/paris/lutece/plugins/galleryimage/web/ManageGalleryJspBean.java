@@ -73,7 +73,7 @@ import jakarta.inject.Inject;
 
 @RequestScoped
 @Named
-@Controller( controllerJsp = "ManageGallery.jsp", controllerPath = "jsp/admin/plugins/galleryimage/", right = ManageGalleryJspBean.RIGHT_GALLERY_IMAGE_MANAGEMENT )
+@Controller( controllerJsp = "ManageGallery.jsp", controllerPath = "jsp/admin/plugins/galleryimage/", right = ManageGalleryJspBean.RIGHT_GALLERY_IMAGE_MANAGEMENT, securityTokenEnabled = true )
 public class ManageGalleryJspBean extends MVCAdminJspBean
 {
     public static final String  RIGHT_GALLERY_IMAGE_MANAGEMENT      = "GALLERY_IMAGE_MANAGEMENT";

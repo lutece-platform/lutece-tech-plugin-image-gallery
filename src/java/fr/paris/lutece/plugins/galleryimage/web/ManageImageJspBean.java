@@ -74,7 +74,7 @@ import jakarta.servlet.http.HttpServletRequest;
 
 @RequestScoped
 @Named
-@Controller( controllerJsp = "ManageImage.jsp", controllerPath = "jsp/admin/plugins/galleryimage/", right = ManageGalleryJspBean.RIGHT_GALLERY_IMAGE_MANAGEMENT )
+@Controller( controllerJsp = "ManageImage.jsp", controllerPath = "jsp/admin/plugins/galleryimage/", right = ManageGalleryJspBean.RIGHT_GALLERY_IMAGE_MANAGEMENT, securityTokenEnabled = true )
 public class ManageImageJspBean extends MVCAdminJspBean
 {
 
