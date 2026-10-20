@@ -1,7 +1,7 @@
 <#if listImages?has_content>
 <#list listImages as image>
-	<div class="swiper-slide">
-		<img src="${image.imageBase64!}" alt="" data-id-file="${image.idFile}" data-src="${image.imageBase64!}" class="img-gallery-content"/>
-	</div>	
+	<button class="swiper-slide" title="${image.title}" type="button" tabindex="-1" aria-roledescription="slide" onkeypress="return enterPressedOnSlide(event)">
+		<img src="${image.imageBase64!}" alt="${image.title}" data-id-file="${image.idFile}" tabindex="-1" data-src="${image.imageBase64!}" class="img-gallery-content pointer-events-none"/>
+	</button>
 </#list>
 </#if>
