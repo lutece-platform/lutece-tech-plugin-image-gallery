@@ -14,7 +14,7 @@
 				<!-- Slides -->
 				<#if listImages?has_content>
 				<#list listImages as image>
-					<button class="swiper-slide" title="Selectionner ${image.title}" type="button" tabindex="-1" aria-roledescription="slide" onkeypress="return enterPressedOnSlide(event)">
+					<button class="swiper-slide" title="${image.title}" type="button" tabindex="-1" aria-roledescription="slide" onkeypress="return enterPressedOnSlide(event)">
 						<img src="${image.imageBase64!}" alt="${image.title}" data-id-file="${image.idFile}" tabindex="-1" data-src="${image.imageBase64!}" class="img-gallery-content pointer-events-none"/>
 					</button>	
 				</#list>
@@ -255,11 +255,11 @@
    		manageSlideTabIndex()
    	});
    	
-  	//event listeners on slides to manage selected gallery image display
-	document.querySelectorAll('.swiper-slide').forEach(el => {
-		el.addEventListener("click", (event) => {
+  	//delegated listener: also covers the slides appended on reachEnd (pages 2+)
+	document.querySelector('.swiper-wrapper').addEventListener("click", (event) => {
+		if ( event.target.closest('.swiper-slide') ) {
 			manageSelectedGalleryImageDisplay(event)
-	   	});
+		}
 	});
 	
 	$('#delete-selected-image').click( function ( ){
@@ -280,11 +280,11 @@
   	}
     
     function manageSelectedGalleryImageDisplay(event) {
-  		var dataset = event.target.firstElementChild.dataset.idFile;
-		$("#selected-gallery-image").val(dataset);
+  		var img = event.target.closest('.swiper-slide').querySelector('img');
+		$("#selected-gallery-image").val(img.dataset.idFile);
 		//Seleted image
-		$('#src-selected-image').attr('src',event.target.firstElementChild.dataset.src);
-		$('#src-selected-image').attr('aria-label',event.target.firstElementChild.getAttribute('alt'));
+		$('#src-selected-image').attr('src',img.dataset.src);
+		$('#src-selected-image').attr('aria-label',img.getAttribute('alt'));
 		$('#selected-image-group').show();
     }
    	
