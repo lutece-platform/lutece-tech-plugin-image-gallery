@@ -5,27 +5,27 @@
 			</@boxHeader>
 			<@boxBody>
 				<@tform action='jsp/admin/plugins/galleryimage/ManageGallery.jsp?action=createGalleryImage' method='post' >
-					<@formGroup labelKey='#i18n{galleryimage.create_gallery_image.label}' helpKey='#i18n{galleryimage.create_gallery_image.labelHelp}' max=255 mandatory=true>
-						<@input type='text' name='label' mandatory=mandatory></@input>
+					<@formGroup labelKey='#i18n{galleryimage.create_gallery_image.label}' helpKey='#i18n{galleryimage.create_gallery_image.labelHelp}' labelFor='label' mandatory=true>
+						<@input type='text' id='label' name='label' mandatory=mandatory></@input>
 					</@formGroup>
 							
-					<@formGroup labelKey='#i18n{galleryimage.create_gallery_image.typeGallery}' helpKey='#i18n{galleryimage.create_gallery_image.typeGalleryHelp}' mandatory=true>
+					<@formGroup labelFor='typeGallery' labelKey='#i18n{galleryimage.create_gallery_image.typeGallery}' helpKey='#i18n{galleryimage.create_gallery_image.typeGalleryHelp}' mandatory=true>
 						<@inputGroup>
 						    <@select id="typeGallery" name='galleryImageType' items=refListGallerytype />
 						</@inputGroup>
 					</@formGroup>
 					
-					<@formGroup labelKey='#i18n{galleryimage.create_gallery_image.height}' helpKey='#i18n{galleryimage.create_gallery_image.heightHelp}' max=255 mandatory=true>
+					<@formGroup labelKey='#i18n{galleryimage.create_gallery_image.height}' helpKey='#i18n{galleryimage.create_gallery_image.heightHelp}' labelFor='height' mandatory=true>
 						<@input type='number' id="height" name='heightGallery' value='500' mandatory=mandatory></@input>
 					</@formGroup>
 		
-					<@formGroup labelKey='#i18n{galleryimage.create_gallery_image.width}' helpKey='#i18n{galleryimage.create_gallery_image.widthHelp}' max=255mandatory=true>
+					<@formGroup labelKey='#i18n{galleryimage.create_gallery_image.width}' helpKey='#i18n{galleryimage.create_gallery_image.widthHelp}' labelFor='width' mandatory=true>
 						<@input type='number' id="width" name='widthGallery' value='850' mandatory=mandatory></@input>
 					</@formGroup>
-					<@formGroup rows=2 labelKey='#i18n{galleryimage.create_gallery_image.labelAuthenticatedMode}' labelFor='authenticatedMode' >
+					<@fieldSet legend='#i18n{galleryimage.create_gallery_image.labelAuthenticatedMode}'>
 						<@radioButton labelKey='#i18n{galleryimage.create_gallery_image.labelAuthenticatedMode.enable}' name="authenticatedMode" value="true" />
 						<@radioButton labelKey='#i18n{galleryimage.create_gallery_image.labelAuthenticatedMode.disable}' name="authenticatedMode"  value="false"/>
-					</@formGroup>
+					</@fieldSet>
 					
 					<!-- Prévisualisation -->
 					<@div class="bg-light pt-2 pb-4 text-center">
