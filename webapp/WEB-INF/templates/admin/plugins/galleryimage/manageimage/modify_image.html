@@ -3,28 +3,27 @@
 		<@row>
 			<@columns lg=6>
 				<@box>
-					#i18n{galleryimage.modify_image.title}
-					<@boxHeader title=boxHeaderTitle />
+					<@boxHeader title='#i18n{galleryimage.modify_image.title}' />
 					<@boxBody> 
 						<@formGroup labelFor='image_title' labelKey='#i18n{galleryimage.modify_image.labelImageTitle}' helpKey='#i18n{galleryimage.modify_image.labelImageTitleHelp}' mandatory=true rows=2>
 							<@input type='text' name='title' id='image_title' value="${(image.title)!}"/>
 						</@formGroup>
-						<@formGroup labelFor='image_summary' labelKey='#i18n{galleryimage.modify_image.labelImageSummary}' helpKey='#i18n{galleryimage.modify_image.labelImageSummaryHelp}' mandatory=true rows=2>
+						<@formGroup labelFor='description' labelKey='#i18n{galleryimage.modify_image.labelImageSummary}' helpKey='#i18n{galleryimage.modify_image.labelImageSummaryHelp}' mandatory=true rows=2>
 							<@input type='textarea' name='description' id='description' value="${(image.description)!}" />
 						</@formGroup>
 						<@fieldSet legend='#i18n{galleryimage.modify_image.attributTitle}'>
-							<@formGroup formStyle='inline' labelFor='image' labelKey='' helpKey='' checked=true>
+							<@formGroup formStyle='inline' labelFor='image' labelKey='#i18n{galleryimage.modify_image.labelImageFile}'>
 								<@inputGroup>
 								<@input type='file' name='image' id='image' />
 								<span class="input-group-addon">
-									<@checkBox labelFor='image_croppable' labelKey='#i18n{galleryimage.modify_image.attributeType.image.resize}' name='image_croppable' id='crop' />
+									<@checkBox labelKey='#i18n{galleryimage.modify_image.attributeType.image.resize}' name='image_croppable' id='crop' />
 								</span>
 								</@inputGroup>
 								</@formGroup>
 								<@formGroup formStyle='' labelFor='image_width' labelKey='#i18n{galleryimage.modify_image.attributeType.image.width}' id="crop_group">
 								<@inputGroup class='w-25'>
 									<@input type='number' name='image_width' value='' placeHolder='#i18n{galleryimage.modify_image.attributeType.image.width}' id='image_width' />
-									<span class="input-group-addon">px<span>
+									<span class="input-group-addon">px</span>
 								</@inputGroup>
 							</@formGroup>
 							<#if image?? && image.imageBase64??>

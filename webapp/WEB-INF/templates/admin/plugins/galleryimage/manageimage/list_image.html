@@ -22,8 +22,8 @@
 							<@td>${(image.title)!}</@td>
 							<@td>${(image.idFile)!}</@td>
 							<@td>
-								<@aButton href='jsp/admin/plugins/galleryimage/ManageImage.jsp?view=modifyImage&id=${(image.idImage)!}' buttonIcon='edit' size='sm' title='#i18n{galleryimage.manage_gallery_image.button_modify}' hideTitle=['all'] />
-								<@aButton href='jsp/admin/plugins/galleryimage/ManageImage.jsp?action=deleteImage&id=${(image.idImage)!}&_csrftoken=${(delete_image_token)!}' buttonIcon='trash' size='sm' title='#i18n{galleryimage.manage_gallery_image.button_delete}' hideTitle=['all'] color='danger' />
+								<@aButton href='jsp/admin/plugins/galleryimage/ManageImage.jsp?view=modifyImage&id=${(image.idImage)!}' buttonIcon='edit' size='sm' title='#i18n{galleryimage.manage_gallery_image.button_modify}' hideTitle=['all'] params={'aria-label': '#i18n{galleryimage.manage_gallery_image.button_modify} ' + ((image.title)!'')} />
+								<@aButton href='jsp/admin/plugins/galleryimage/ManageImage.jsp?action=deleteImage&id=${(image.idImage)!}&_csrftoken=${(delete_image_token)!}' buttonIcon='trash' size='sm' title='#i18n{galleryimage.manage_gallery_image.button_delete}' hideTitle=['all'] color='danger' params={'aria-label': '#i18n{galleryimage.manage_gallery_image.button_delete} ' + ((image.title)!'')} />
 							</@td>
 						</@tr>
 						</#list>
