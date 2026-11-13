@@ -29,9 +29,9 @@
 					
 					<@formGroup rows=2 labelKey='#i18n{galleryimage.create_gallery_image.labelAuthenticatedMode}' labelFor='authenticatedMode' >
 					    <#if config.authenticatedMode> <#assign checkedValue = true> <#else> <#assign checkedValue = false> </#if>
-						<@radioButton labelKey='#i18n{galleryimage.create_gallery_image.labelAuthenticatedMode.enable}' name="authenticatedMode" value="true" checked=checkedValue params=((feedbackConfig?? && feedbackConfig.authenticatedMode )?string('checked=true','false')!) />
+						<@radioButton labelKey='#i18n{galleryimage.create_gallery_image.labelAuthenticatedMode.enable}' name="authenticatedMode" value="true" checked=checkedValue />
 						<#if config.authenticatedMode> <#assign checkedValue = false> <#else> <#assign checkedValue = true> </#if>
-						<@radioButton labelKey='#i18n{galleryimage.create_gallery_image.labelAuthenticatedMode.disable}' name="authenticatedMode"  value="false" checked=checkedValue params=((feedbackConfig?? && !feedbackConfig.authenticatedMode )?string('checked=true','false')!)/>
+						<@radioButton labelKey='#i18n{galleryimage.create_gallery_image.labelAuthenticatedMode.disable}' name="authenticatedMode"  value="false" checked=checkedValue/>
 					</@formGroup>
 					
 					<!-- Pr�visualisation -->

@@ -1,4 +1,3 @@
-<#escape x as x?html>
 	<@tform method='post' action='jsp/admin/plugins/galleryimage/ManageImage.jsp' enctype='multipart/form-data'>
 		<@input type='hidden' name='id' value="${(image.idImage)!}"/>
 		<@row>
@@ -14,7 +13,6 @@
 							<@input type='textarea' name='description' id='description' value="${(image.description)!}" />
 						</@formGroup>
 						<@fieldSet legend='#i18n{galleryimage.modify_image.attributTitle}'>
-							<#noescape>
 							<@formGroup formStyle='inline' labelFor='image' labelKey='' helpKey='' checked=true>
 								<@inputGroup>
 								<@input type='file' name='image' id='image' />
@@ -24,12 +22,11 @@
 								</@inputGroup>
 								</@formGroup>
 								<@formGroup formStyle='' labelFor='image_width' labelKey='#i18n{galleryimage.modify_image.attributeType.image.width}' id="crop_group">
-								<@inputGroup params='style="width:20%"'>
+								<@inputGroup class='w-25'>
 									<@input type='number' name='image_width' value='' placeHolder='#i18n{galleryimage.modify_image.attributeType.image.width}' id='image_width' />
 									<span class="input-group-addon">px<span>
 								</@inputGroup>
 							</@formGroup>
-							</#noescape>
 							<#if image?? && image.imageBase64??>
 								<@formGroup rows=2>
 								<img src="${image.imageBase64!}" width="250" height="150" alt=""/>
@@ -45,7 +42,6 @@
 			</@columns>
 		</@row>
 	</@tform>
-</#escape>
 <#include "/admin/util/editor/editor.html" />
 <@initEditor />
 <script>

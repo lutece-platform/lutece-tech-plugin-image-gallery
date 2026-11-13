@@ -1,10 +1,12 @@
  <#macro galleryImage codeGallery='' inputName='' idFileSelected=''>
+ 	<#-- idFileSelected is the id of a file, a number, or an empty string -->
+ 	<#local strIdFileSelected = idFileSelected?is_number?then( idFileSelected?c, idFileSelected ) />
  	<div class="gallery-image"></div>
  	<script>
 		var request = $.ajax( { 
 			url : 'servlet/plugins/galleryimage',
 			type : 'GET',
-			data : {codeGallery:'${codeGallery!}',inputName:'${inputName}',idFileSelected:'${idFileSelected}'},
+			data : {codeGallery:'${(codeGallery!)?js_string?no_esc}',inputName:'${inputName?js_string?no_esc}',idFileSelected:'${strIdFileSelected?js_string?no_esc}'},
 			dataType : 'html'
 		} );
 		

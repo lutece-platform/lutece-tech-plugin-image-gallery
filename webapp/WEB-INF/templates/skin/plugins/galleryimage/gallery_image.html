@@ -5,7 +5,7 @@
 	<!-- Navigation -->
 	<div class="swiper-navigation-wrapper">
 	
-		<div class="swiper-button-prev" onkeypress="return enterPressedOnButton(event)"></div>
+		<div class="swiper-button-prev"></div>
 		
 		<div class="navigation swiper">
 		
@@ -14,7 +14,7 @@
 				<!-- Slides -->
 				<#if listImages?has_content>
 				<#list listImages as image>
-					<button class="swiper-slide" title="Selectionner ${image.title}" type="button" tabindex="-1" aria-roledescription="slide" onkeypress="return enterPressedOnSlide(event)">
+					<button class="swiper-slide" title="Selectionner ${image.title}" type="button" tabindex="-1" aria-roledescription="slide">
 						<img src="${image.imageBase64!}" alt="${image.title}" data-id-file="${image.idFile}" tabindex="-1" data-src="${image.imageBase64!}" class="img-gallery-content pointer-events-none"/>
 					</button>	
 				</#list>
@@ -26,7 +26,7 @@
 			<div id="fullscreen-swiper-backdrop"></div>
 		</div>
 		
-		<div class="swiper-button-next" onkeypress="return enterPressedOnButton(event)"></div>
+		<div class="swiper-button-next"></div>
 	</div>
 
 	<script>
@@ -217,15 +217,15 @@
 <div class="form-files-group" id="selected-image-group" <#if !idFileSelected?has_content>style="display:none;"</#if>>
 	<label>Image s&eacute;lectionn&eacute;e</label>
 	<div class="col-md-12">
-		<img aria-label="" id="src-selected-image" alt="" width="80" height="80" <#if idFileSelected?? && idFileSelected?has_content> src="image?resource_type=public_image_resource&id=${idFileSelected!}" </#if>>
+		<img aria-label="" id="src-selected-image" alt="" width="80" height="80" <#if idFileSelected?? && idFileSelected?has_content> src="image?resource_type=public_image_resource&id=${(idFileSelected!)?url}" </#if>>
 		<button type="button" class="btn btn-danger btn-sm" id="delete-selected-image" >D&eacute;s&eacute;lectionner</button>
 	</div>
 </div>
 </#if>
 
 <script>
-	var parginator = '${pagesCount!}'
-	var index = '${index!}';
+	var parginator = ${(pagesCount!0)?c};
+	var index = ${(index!1)?c};
 		
 	swiper.on('reachEnd', function () {
 		if ( index < parginator){
@@ -233,7 +233,7 @@
 			var request = $.ajax( { 
 				url : 'servlet/plugins/galleryimage',
 				type : 'GET',
-				data : {codeGallery:'${config.codeGallery!}', index:index},
+				data : {codeGallery:'${((config.codeGallery)!)?js_string?no_esc}', index:index},
 				dataType : 'html'
 			} );
 			
@@ -254,12 +254,16 @@
    	document.querySelector('.swiper-button-next').addEventListener("click", (event) => {
    		manageSlideTabIndex()
    	});
+   	document.querySelectorAll('.swiper-button-prev, .swiper-button-next').forEach(el => {
+   		el.addEventListener("keypress", enterPressedOnButton);
+   	});
    	
   	//event listeners on slides to manage selected gallery image display
 	document.querySelectorAll('.swiper-slide').forEach(el => {
 		el.addEventListener("click", (event) => {
 			manageSelectedGalleryImageDisplay(event)
 	   	});
+		el.addEventListener("keypress", enterPressedOnSlide);
 	});
 	
 	$('#delete-selected-image').click( function ( ){
@@ -298,8 +302,8 @@
 </script>
 <style>
 .swiper {
-	width: ${(config.widthGallery)!}px;
-	height: ${(config.heightGallery)!}px;
+	width: ${(config.widthGallery?c)!}px;
+	height: ${(config.heightGallery?c)!}px;
 }
 
 .swiper-slide img {
