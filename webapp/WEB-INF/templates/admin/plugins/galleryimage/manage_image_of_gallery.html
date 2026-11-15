@@ -1,10 +1,12 @@
 <link rel="stylesheet" href="css/plugins/galleryimage/custom-galleryimage.css" />
+<@pageContainer>
+<@pageColumn>
+<@pageHeader title='#i18n{galleryimage.manage_image.title}'>
+	<@aButton href='jsp/admin/plugins/galleryimage/ManageImage.jsp?view=GetCreateImage&idGallery=${idGallery!}' buttonIcon='plus' title='#i18n{galleryimage.manage_image.add_new_image}' size='' color='primary' />
+</@pageHeader>
 <@row>
 	<@columns>
 		<@box>
-			<@boxHeader title='#i18n{galleryimage.manage_image.title}'>				
-				<@aButton href='jsp/admin/plugins/galleryimage/ManageImage.jsp?view=GetCreateImage&idGallery=${idGallery!}' buttonIcon='plus' title='#i18n{galleryimage.manage_image.add_new_image}' size='' color='primary' />
-			</@boxHeader>
 			<@boxBody>
 				<@div class="galleryimage-selector">
 					<!-- Tab panes -->
@@ -89,3 +91,5 @@
 		</@box>
 	</@columns>
 </@row>
+</@pageColumn>
+</@pageContainer>

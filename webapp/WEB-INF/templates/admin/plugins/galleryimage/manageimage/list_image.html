@@ -1,11 +1,13 @@
+<@pageContainer>
+<@pageColumn>
+<@pageHeader title='#i18n{galleryimage.gallery_image.list_image.name}'>
+	<@tform method='get' action='jsp/admin/plugins/galleryimage/ManageImage.jsp' type='inline'>
+		<@button type='submit' name='view_createImage' buttonIcon='plus' title='#i18n{galleryimage.gallery_image.list_image.button_create_image}' size='' color='primary' />
+	</@tform>
+</@pageHeader>
 <@row>
 	<@columns>
 		<@box color='info'>
-			<@boxHeader title='#i18n{galleryimage.gallery_image.list_image.name}' boxTools=true skipHeader=false>
-				<@tform method='get' action='jsp/admin/plugins/galleryimage/ManageImage.jsp' type='inline'>
-					<@button type='submit' name='view_createImage' buttonIcon='plus' title='#i18n{galleryimage.gallery_image.list_image.button_create_image}' size='' color='primary' />
-				</@tform>
-			</@boxHeader>
 			<@boxBody>
 			<@table>
 				<@tr>
@@ -33,3 +35,5 @@
 		</@box>
 	</@columns>
 </@row>
+</@pageColumn>
+</@pageContainer>

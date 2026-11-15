@@ -1,8 +1,9 @@
+<@pageContainer>
+<@pageColumn>
+<@pageHeader title='#i18n{galleryimage.create_gallery_image.title}' />
 <@row>
 	<@columns>
 		<@box color='info'>
-			<@boxHeader title='#i18n{galleryimage.create_gallery_image.title}' boxTools=true skipHeader=false>
-			</@boxHeader>
 			<@boxBody>
 				<@tform action='jsp/admin/plugins/galleryimage/ManageGallery.jsp?action=createGalleryImage' method='post' >
 					<@formGroup labelKey='#i18n{galleryimage.create_gallery_image.label}' helpKey='#i18n{galleryimage.create_gallery_image.labelHelp}' labelFor='label' mandatory=true>
@@ -39,6 +40,8 @@
 		</@box>
 	</@columns>
 </@row>
+</@pageColumn>
+</@pageContainer>
 <script>
 	//Preview gallery type
 	$('.swiper').hide( );
