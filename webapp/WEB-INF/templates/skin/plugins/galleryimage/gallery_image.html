@@ -258,12 +258,16 @@
    		el.addEventListener("keypress", enterPressedOnButton);
    	});
    	
-  	//event listeners on slides to manage selected gallery image display
-	document.querySelectorAll('.swiper-slide').forEach(el => {
-		el.addEventListener("click", (event) => {
+  	//delegated listener: also covers the slides appended on reachEnd (pages 2+)
+	document.querySelector('.swiper-wrapper').addEventListener("click", (event) => {
+		if ( event.target.closest('.swiper-slide') ) {
 			manageSelectedGalleryImageDisplay(event)
-	   	});
-		el.addEventListener("keypress", enterPressedOnSlide);
+		}
+	});
+	document.querySelector('.swiper-wrapper').addEventListener("keypress", (event) => {
+		if ( event.target.closest('.swiper-slide') ) {
+			enterPressedOnSlide(event)
+		}
 	});
 	
 	$('#delete-selected-image').click( function ( ){
@@ -284,11 +288,11 @@
   	}
     
     function manageSelectedGalleryImageDisplay(event) {
-  		var dataset = event.target.firstElementChild.dataset.idFile;
-		$("#selected-gallery-image").val(dataset);
+  		var img = event.target.closest('.swiper-slide').querySelector('img');
+		$("#selected-gallery-image").val(img.dataset.idFile);
 		//Seleted image
-		$('#src-selected-image').attr('src',event.target.firstElementChild.dataset.src);
-		$('#src-selected-image').attr('alt',event.target.firstElementChild.getAttribute('alt'));
+		$('#src-selected-image').attr('src',img.dataset.src);
+		$('#src-selected-image').attr('alt',img.getAttribute('alt'));
 		$('#selected-image-group').show();
     }
    	
