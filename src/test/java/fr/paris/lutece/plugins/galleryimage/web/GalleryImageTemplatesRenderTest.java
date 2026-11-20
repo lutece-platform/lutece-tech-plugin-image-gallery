@@ -73,7 +73,7 @@ public class GalleryImageTemplatesRenderTest extends LuteceTestCase
         assertTrue( strHtml, strHtml.contains( "title=\"Selectionner " + TITLE_ESCAPED + "\"" ) );
         assertTrue( strHtml, strHtml.contains( "alt=\"" + TITLE_ESCAPED + "\"" ) );
         assertFalse( strHtml, strHtml.contains( "<b>" ) );
-        assertTrue( strHtml, strHtml.contains( "codeGallery:'" + CODE_GALLERY_JS + "'" ) );
+        assertTrue( strHtml, strHtml.contains( "codeGallery: '" + CODE_GALLERY_JS + "'" ) );
         assertTrue( strHtml, strHtml.contains( "var parginator = 12;" ) );
         assertTrue( strHtml, strHtml.contains( "var index = 1;" ) );
         assertTrue( strHtml, strHtml.contains( "&id=7%268\"" ) );
@@ -91,9 +91,9 @@ public class GalleryImageTemplatesRenderTest extends LuteceTestCase
 
         String strHtml = AppTemplateService.getTemplateFromStringFtl( strTemplate, Locale.FRENCH, model ).getHtml( );
 
-        assertTrue( strHtml, strHtml.contains( "codeGallery:'" + CODE_GALLERY_JS + "'" ) );
-        assertTrue( strHtml, strHtml.contains( "inputName:'attribute1'" ) );
-        assertTrue( strHtml, strHtml.contains( "idFileSelected:'12345'" ) );
+        assertTrue( strHtml, strHtml.contains( "codeGallery: '" + CODE_GALLERY_JS + "'" ) );
+        assertTrue( strHtml, strHtml.contains( "inputName: 'attribute1'" ) );
+        assertTrue( strHtml, strHtml.contains( "idFileSelected: '12345'" ) );
     }
 
     private static Gallery gallery( )

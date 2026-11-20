@@ -230,16 +230,11 @@
 	swiper.on('reachEnd', function () {
 		if ( index < parginator){
 			index++;			
-			var request = $.ajax( { 
-				url : 'servlet/plugins/galleryimage',
-				type : 'GET',
-				data : {codeGallery:'${((config.codeGallery)!)?js_string?no_esc}', index:index},
-				dataType : 'html'
-			} );
-			
-			request.done( function ( content ) {
-				swiper.appendSlide([content]);
-			} );
+			// Vanilla JS (fetch): the front office themes do not load the jquery library
+			fetch( 'servlet/plugins/galleryimage?' + new URLSearchParams( { codeGallery: '${((config.codeGallery)!)?js_string?no_esc}', index: index } ).toString( ), { credentials: 'same-origin' } )
+				.then( ( response ) => response.ok ? response.text( ) : Promise.reject( new Error( 'HTTP ' + response.status ) ) )
+				.then( ( content ) => swiper.appendSlide( [ content ] ) )
+				.catch( ( error ) => console.error( error ) );
 		}
 	});
 
@@ -266,9 +261,9 @@
 		el.addEventListener("keypress", enterPressedOnSlide);
 	});
 	
-	$('#delete-selected-image').click( function ( ){
-		$('#selected-image-group').hide();
-		$("#selected-gallery-image").val(null);
+	document.getElementById('delete-selected-image').addEventListener( 'click', function ( ){
+		document.getElementById('selected-image-group').style.display = 'none';
+		document.getElementById('selected-gallery-image').value = '';
 	});
    	
    	function enterPressedOnButton (event) {
@@ -285,11 +280,12 @@
     
     function manageSelectedGalleryImageDisplay(event) {
   		var dataset = event.target.firstElementChild.dataset.idFile;
-		$("#selected-gallery-image").val(dataset);
+		document.getElementById('selected-gallery-image').value = dataset;
 		//Seleted image
-		$('#src-selected-image').attr('src',event.target.firstElementChild.dataset.src);
-		$('#src-selected-image').attr('alt',event.target.firstElementChild.getAttribute('alt'));
-		$('#selected-image-group').show();
+		const selectedImage = document.getElementById('src-selected-image');
+		selectedImage.setAttribute('src',event.target.firstElementChild.dataset.src);
+		selectedImage.setAttribute('alt',event.target.firstElementChild.getAttribute('alt'));
+		document.getElementById('selected-image-group').style.display = '';
     }
    	
    	function manageSlideTabIndex() {
