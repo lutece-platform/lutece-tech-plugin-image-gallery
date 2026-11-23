@@ -12,7 +12,7 @@
     <artifactId>plugin-galleryimage</artifactId>
     <packaging>lutece-plugin</packaging>
     
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.3-SNAPSHOT</version>
     <name>Lutece galleryimage plugin</name>
 
     <repositories>
