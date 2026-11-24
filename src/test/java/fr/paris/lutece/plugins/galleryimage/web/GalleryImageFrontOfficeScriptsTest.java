@@ -62,4 +62,22 @@ public class GalleryImageFrontOfficeScriptsTest
             assertFalse( JQUERY.matcher( strContent ).find( ), strTemplate + " uses jQuery" );
         }
     }
+
+    /**
+     * A gallery without image has no active slide, and the pagination display has no navigation buttons: the script must not use these elements
+     * without checking them (TypeError "Cannot read properties of null")
+     */
+    @Test
+    public void testOptionalElementsAreChecked( ) throws IOException
+    {
+        String strContent = Files.readString( Path.of( "webapp/WEB-INF/templates/skin/plugins/galleryimage/gallery_image.html" ), StandardCharsets.UTF_8 );
+        for ( String strSelector : new String [ ] {
+                ".swiper-slide-active", ".swiper-button-prev", ".swiper-button-next"
+        } )
+        {
+            assertFalse( strContent.contains( "querySelector('" + strSelector + "')." ), strSelector + " used without check" );
+        }
+        assertFalse( strContent.contains( "getElementById('delete-selected-image')." ), "delete-selected-image used without check" );
+        assertFalse( strContent.matches( "(?s).*\\n\\s*swiper\\.on\\(.*" ), "swiper used without check" );
+    }
 }

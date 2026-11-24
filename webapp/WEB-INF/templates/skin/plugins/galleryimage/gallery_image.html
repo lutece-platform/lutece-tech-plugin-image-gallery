@@ -227,7 +227,8 @@
 	var parginator = ${(pagesCount!0)?c};
 	var index = ${(index!1)?c};
 		
-	swiper.on('reachEnd', function () {
+	// no swiper without the configuration of the gallery
+	if ( typeof swiper !== 'undefined' ) swiper.on('reachEnd', function () {
 		if ( index < parginator){
 			index++;			
 			// Vanilla JS (fetch): the front office themes do not load the jquery library
@@ -243,10 +244,11 @@
 	manageSlideTabIndex()
    
 	//event listeners on buttons to manage tabindex for the slides
-   	document.querySelector('.swiper-button-prev').addEventListener("click", (event) => {
+   	// the navigation buttons only exist in some display types of the gallery
+   	document.querySelector('.swiper-button-prev')?.addEventListener("click", (event) => {
    		manageSlideTabIndex()
    	});
-   	document.querySelector('.swiper-button-next').addEventListener("click", (event) => {
+   	document.querySelector('.swiper-button-next')?.addEventListener("click", (event) => {
    		manageSlideTabIndex()
    	});
    	document.querySelectorAll('.swiper-button-prev, .swiper-button-next').forEach(el => {
@@ -261,7 +263,7 @@
 		el.addEventListener("keypress", enterPressedOnSlide);
 	});
 	
-	document.getElementById('delete-selected-image').addEventListener( 'click', function ( ){
+	document.getElementById('delete-selected-image')?.addEventListener( 'click', function ( ){
 		document.getElementById('selected-image-group').style.display = 'none';
 		document.getElementById('selected-gallery-image').value = '';
 	});
@@ -292,7 +294,8 @@
    		document.querySelectorAll('.swiper-slide').forEach(el => {
    			el.setAttribute('tabindex','-1');
    		});
-     	document.querySelector('.swiper-slide-active').setAttribute('tabindex','0');
+     	// a gallery without image has no active slide
+     	document.querySelector('.swiper-slide-active')?.setAttribute('tabindex','0');
    	}
 	</#if>
 </script>
