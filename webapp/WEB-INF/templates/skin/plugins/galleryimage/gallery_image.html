@@ -30,7 +30,7 @@
 	</div>
 
 	<script>
-		var swiper = new Swiper(".navigation", {
+		var swiper = new Swiper(".gallery-image .navigation", {
 			navigation : {
 				nextEl : ".swiper-button-next",
 				prevEl : ".swiper-button-prev",
@@ -56,7 +56,7 @@
 		<div class="swiper-pagination"></div>
 	</div>
 	<script>
-		var swiper = new Swiper(".pagination", {
+		var swiper = new Swiper(".gallery-image .pagination", {
 			pagination : {
 				el : ".swiper-pagination",
 			}
@@ -83,7 +83,7 @@
 		<div class="swiper-pagination"></div>
 	</div>
 	<script>
-		var swiper = new Swiper(".paginationProgress", {
+		var swiper = new Swiper(".gallery-image .paginationProgress", {
 			pagination : {
 				el : ".swiper-pagination",
 				type : "progressbar",
@@ -113,7 +113,7 @@
 		<div class="swiper-scrollbar"></div>
 	</div>
 	<script>
-		var swiper = new Swiper(".scrollbar", {
+		var swiper = new Swiper(".gallery-image .scrollbar", {
 			scrollbar : {
 				el : ".swiper-scrollbar",
 				hide : true,
@@ -139,7 +139,7 @@
 		<div class="swiper-pagination"></div>
 	</div>
 	<script>
-		var swiper = new Swiper(".vertical", {
+		var swiper = new Swiper(".gallery-image .vertical", {
 			direction : "vertical",
 			pagination : {
 				el : ".swiper-pagination",
@@ -166,7 +166,7 @@
 		<div class="swiper-pagination"></div>
 	</div>
 	<script>
-		var swiper = new Swiper(".freemode", {
+		var swiper = new Swiper(".gallery-image .freemode", {
 			slidesPerView : 3,
 			spaceBetween : 30,
 			freeMode : true,
@@ -197,7 +197,7 @@
 		<div class="swiper-pagination"></div>
 	</div>
 	<script>
-		var swiper = new Swiper(".zoom", {
+		var swiper = new Swiper(".gallery-image .zoom", {
 			zoom : true,
 			navigation : {
 				nextEl : ".swiper-button-next",
@@ -281,12 +281,12 @@
   	}
     
     function manageSelectedGalleryImageDisplay(event) {
-  		var dataset = event.target.firstElementChild.dataset.idFile;
-		document.getElementById('selected-gallery-image').value = dataset;
+  		var img = event.target.closest('.swiper-slide').querySelector('img');
+		document.getElementById('selected-gallery-image').value = img.dataset.idFile;
 		//Seleted image
 		const selectedImage = document.getElementById('src-selected-image');
-		selectedImage.setAttribute('src',event.target.firstElementChild.dataset.src);
-		selectedImage.setAttribute('alt',event.target.firstElementChild.getAttribute('alt'));
+		selectedImage.setAttribute('src',img.dataset.src);
+		selectedImage.setAttribute('alt',img.getAttribute('alt'));
 		document.getElementById('selected-image-group').style.display = '';
     }
    	
@@ -340,8 +340,10 @@
     justify-content: center;
     color: var(--swiper-navigation-color,var(--swiper-theme-color));
 }
-.swiper-navigation-wrapper {position: relative; width: fit-content;}
-.swiper-navigation-wrapper .swiper-button-prev {left: -36px; color:var(--main-info-color)}
-.swiper-navigation-wrapper .swiper-button-next {right: -36px;color:var(--main-info-color)}
+.swiper-navigation-wrapper {position: relative; width: fit-content; margin: 0 36px;}
+.swiper-navigation-wrapper .swiper-button-prev {left: -36px; color:var(--main-info-color, var(--swiper-theme-color))}
+.swiper-navigation-wrapper .swiper-button-next {right: -36px;color:var(--main-info-color, var(--swiper-theme-color))}
+.swiper-button-prev::after, .swiper-button-next::after {font-feature-settings: "liga" 1;}
+button.swiper-slide {border: 0; padding: 0; background: none;}
 
 </style>
