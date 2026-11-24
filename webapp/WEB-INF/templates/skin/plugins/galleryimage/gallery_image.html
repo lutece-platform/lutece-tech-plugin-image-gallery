@@ -292,7 +292,10 @@
    		document.querySelectorAll('.swiper-slide').forEach(el => {
    			el.setAttribute('tabindex','-1');
    		});
-     	document.querySelector('.swiper-slide-active').setAttribute('tabindex','0');
+     	var activeSlide = document.querySelector('.swiper-slide-active') || document.querySelector('.swiper-slide');
+     	if ( activeSlide ) {
+     		activeSlide.setAttribute('tabindex','0');
+     	}
    	}
 	</#if>
 </script>
@@ -337,8 +340,10 @@
     justify-content: center;
     color: var(--swiper-navigation-color,var(--swiper-theme-color));
 }
-.swiper-navigation-wrapper {position: relative; width: fit-content;}
-.swiper-navigation-wrapper .swiper-button-prev {left: -36px; color:var(--main-info-color)}
-.swiper-navigation-wrapper .swiper-button-next {right: -36px;color:var(--main-info-color)}
+.swiper-navigation-wrapper {position: relative; width: fit-content; margin: 0 36px;}
+.swiper-navigation-wrapper .swiper-button-prev {left: -36px; color:var(--main-info-color, var(--swiper-theme-color))}
+.swiper-navigation-wrapper .swiper-button-next {right: -36px;color:var(--main-info-color, var(--swiper-theme-color))}
+.swiper-button-prev::after, .swiper-button-next::after {font-feature-settings: "liga" 1;}
+button.swiper-slide {border: 0; padding: 0; background: none;}
 
 </style>
