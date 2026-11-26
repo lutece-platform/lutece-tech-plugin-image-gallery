@@ -298,8 +298,9 @@
 </script>
 <style>
 .swiper {
-	width: ${(config.widthGallery)!}px;
-	height: ${(config.heightGallery)!}px;
+	width: 100%;
+	max-width: ${(config.widthGallery?c)!}px;
+	aspect-ratio: ${(config.widthGallery?c)!} / ${(config.heightGallery?c)!};
 }
 
 .swiper-slide img {
@@ -337,8 +338,9 @@
     justify-content: center;
     color: var(--swiper-navigation-color,var(--swiper-theme-color));
 }
-.swiper-navigation-wrapper {position: relative; width: fit-content;}
-.swiper-navigation-wrapper .swiper-button-prev {left: -36px; color:var(--main-info-color)}
-.swiper-navigation-wrapper .swiper-button-next {right: -36px;color:var(--main-info-color)}
+/* the arrows sit in the wrapper padding, so they stay inside the parent on a narrow screen */
+.swiper-navigation-wrapper {position: relative; max-width: calc(${(config.widthGallery?c)!}px + 72px); padding: 0 36px;}
+.swiper-navigation-wrapper .swiper-button-prev {left: 0; color:var(--main-info-color)}
+.swiper-navigation-wrapper .swiper-button-next {right: 0;color:var(--main-info-color)}
 
 </style>
