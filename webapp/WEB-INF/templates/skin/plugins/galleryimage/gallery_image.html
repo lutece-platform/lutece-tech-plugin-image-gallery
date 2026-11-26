@@ -30,7 +30,7 @@
 	</div>
 
 	<script>
-		var swiper = new Swiper(".navigation", {
+		var swiper = new Swiper(".swiper.navigation", {
 			navigation : {
 				nextEl : ".swiper-button-next",
 				prevEl : ".swiper-button-prev",
@@ -56,7 +56,7 @@
 		<div class="swiper-pagination"></div>
 	</div>
 	<script>
-		var swiper = new Swiper(".pagination", {
+		var swiper = new Swiper(".swiper.pagination", {
 			pagination : {
 				el : ".swiper-pagination",
 			}
@@ -83,7 +83,7 @@
 		<div class="swiper-pagination"></div>
 	</div>
 	<script>
-		var swiper = new Swiper(".paginationProgress", {
+		var swiper = new Swiper(".swiper.paginationProgress", {
 			pagination : {
 				el : ".swiper-pagination",
 				type : "progressbar",
@@ -113,7 +113,7 @@
 		<div class="swiper-scrollbar"></div>
 	</div>
 	<script>
-		var swiper = new Swiper(".scrollbar", {
+		var swiper = new Swiper(".swiper.scrollbar", {
 			scrollbar : {
 				el : ".swiper-scrollbar",
 				hide : true,
@@ -139,7 +139,7 @@
 		<div class="swiper-pagination"></div>
 	</div>
 	<script>
-		var swiper = new Swiper(".vertical", {
+		var swiper = new Swiper(".swiper.vertical", {
 			direction : "vertical",
 			pagination : {
 				el : ".swiper-pagination",
@@ -166,7 +166,7 @@
 		<div class="swiper-pagination"></div>
 	</div>
 	<script>
-		var swiper = new Swiper(".freemode", {
+		var swiper = new Swiper(".swiper.freemode", {
 			slidesPerView : 3,
 			spaceBetween : 30,
 			freeMode : true,
@@ -197,7 +197,7 @@
 		<div class="swiper-pagination"></div>
 	</div>
 	<script>
-		var swiper = new Swiper(".zoom", {
+		var swiper = new Swiper(".swiper.zoom", {
 			zoom : true,
 			navigation : {
 				nextEl : ".swiper-button-next",
@@ -255,12 +255,17 @@
    		el.addEventListener("keypress", enterPressedOnButton);
    	});
    	
-  	//event listeners on slides to manage selected gallery image display
-	document.querySelectorAll('.swiper-slide').forEach(el => {
-		el.addEventListener("click", (event) => {
+  	//delegated listeners: also cover the slides appended on reachEnd (pages 2+)
+	const galleryWrapper = document.querySelector('.swiper .swiper-wrapper');
+	galleryWrapper?.addEventListener("click", (event) => {
+		if ( event.target.closest('.swiper-slide') ) {
 			manageSelectedGalleryImageDisplay(event)
-	   	});
-		el.addEventListener("keypress", enterPressedOnSlide);
+		}
+	});
+	galleryWrapper?.addEventListener("keypress", (event) => {
+		if ( event.target.closest('.swiper-slide') ) {
+			enterPressedOnSlide(event)
+		}
 	});
 	
 	document.getElementById('delete-selected-image')?.addEventListener( 'click', function ( ){
@@ -281,12 +286,12 @@
   	}
     
     function manageSelectedGalleryImageDisplay(event) {
-  		var dataset = event.target.firstElementChild.dataset.idFile;
-		document.getElementById('selected-gallery-image').value = dataset;
+  		const img = event.target.closest('.swiper-slide').querySelector('img');
+		document.getElementById('selected-gallery-image').value = img.dataset.idFile;
 		//Seleted image
 		const selectedImage = document.getElementById('src-selected-image');
-		selectedImage.setAttribute('src',event.target.firstElementChild.dataset.src);
-		selectedImage.setAttribute('alt',event.target.firstElementChild.getAttribute('alt'));
+		selectedImage.setAttribute('src',img.dataset.src);
+		selectedImage.setAttribute('alt',img.getAttribute('alt'));
 		document.getElementById('selected-image-group').style.display = '';
     }
    	
@@ -301,8 +306,9 @@
 </script>
 <style>
 .swiper {
-	width: ${(config.widthGallery?c)!}px;
-	height: ${(config.heightGallery?c)!}px;
+	width: 100%;
+	max-width: ${(config.widthGallery?c)!}px;
+	aspect-ratio: ${(config.widthGallery?c)!} / ${(config.heightGallery?c)!};
 }
 
 .swiper-slide img {
@@ -340,8 +346,9 @@
     justify-content: center;
     color: var(--swiper-navigation-color,var(--swiper-theme-color));
 }
-.swiper-navigation-wrapper {position: relative; width: fit-content;}
-.swiper-navigation-wrapper .swiper-button-prev {left: -36px; color:var(--main-info-color)}
-.swiper-navigation-wrapper .swiper-button-next {right: -36px;color:var(--main-info-color)}
+/* the arrows sit in the wrapper padding, so they stay inside the parent on a narrow screen */
+.swiper-navigation-wrapper {position: relative; max-width: calc(${(config.widthGallery?c)!}px + 72px); padding: 0 36px;}
+.swiper-navigation-wrapper .swiper-button-prev {left: 0; color:var(--main-info-color)}
+.swiper-navigation-wrapper .swiper-button-next {right: 0;color:var(--main-info-color)}
 
 </style>
